@@ -1,4 +1,4 @@
-package sk.jmurin.android.testy;
+package sk.jmurin.android.testy.utils;
 
 import android.content.Context;
 import android.net.ConnectivityManager;

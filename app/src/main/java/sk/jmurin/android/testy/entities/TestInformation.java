@@ -10,6 +10,18 @@ public class TestInformation {
     public int answersSize;
     public int id;
 
+    public TestInformation(){
+
+    }
+
+    public TestInformation(Test test, int id) {
+        this.answersSize = test.questions.get(0).answers.size();
+        this.name = test.name;
+        this.questionsSize = test.questions.size();
+        this.version = test.version;
+        this.id = id;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

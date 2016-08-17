@@ -1,17 +1,18 @@
 package sk.jmurin.android.testy;
 
 import android.app.AlertDialog;
+import android.app.LoaderManager;
 import android.app.ProgressDialog;
-import android.content.ContentValues;
 import android.content.Context;
+import android.content.CursorLoader;
+import android.content.Loader;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.util.Log;
-import android.util.StringBuilderPrinter;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -24,35 +25,99 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Headers;
-import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import sk.jmurin.android.testy.content.DataContract;
+import sk.jmurin.android.testy.content.MyContentProvider;
 import sk.jmurin.android.testy.entities.Test;
 import sk.jmurin.android.testy.entities.TestInformation;
+import sk.jmurin.android.testy.entities.TestStats;
+import sk.jmurin.android.testy.fragments.HomeFragment;
+import sk.jmurin.android.testy.utils.DownloadEvents;
 
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
-    private final OkHttpClient client = new OkHttpClient();
-    private List<Test> jsonTests;
-    private List<TestInformation> jsonTestsInfo;
+
+    private class LocalStatsCursorLoader implements LoaderManager.LoaderCallbacks<Cursor> {
+        MainActivity parent;
+
+        public LocalStatsCursorLoader(MainActivity main) {
+            this.parent = main;
+        }
+
+        @Override
+        public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
+            if (id == LOCAL_STATS_LOADER_ID) {
+                System.out.println("creating stats loader");
+                CursorLoader loader = new CursorLoader(parent);
+                Uri uri = DataContract.QuestionStats.CONTENT_URI
+                        .buildUpon()
+                        .build();
+                loader.setUri(uri);
+                return loader;
+            }
+            return null;
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+            if (loader.getId() == LOCAL_STATS_LOADER_ID) {
+                App.testStatsMap = getStatsFrom(cursor);
+                Log.d(TAG, "stats loader finished, loaded stats size: " + App.testStatsMap.size());
+            }
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> loader) {
+
+        }
+
+    }
+
+    private Map<String, TestStats> getStatsFrom(Cursor cursor) {
+        System.out.println("getStatsFrom actionPerformed");
+        Map<String, TestStats> stats = new HashMap<>();
+        while (cursor.moveToNext()) {
+            int stat = cursor.getInt(cursor.getColumnIndex(DataContract.QuestionStats.STAT));
+            int db_id = cursor.getInt(cursor.getColumnIndex(DataContract.QuestionStats._ID));
+            int question_test_id = cursor.getInt(cursor.getColumnIndex(DataContract.QuestionStats.QUESTION_TEST_ID));
+            String test_name = cursor.getString(cursor.getColumnIndex(DataContract.QuestionStats.TEST_NAME));
+            int test_version = cursor.getInt(cursor.getColumnIndex(DataContract.QuestionStats.TEST_VERSION));
+            String tk = test_name + "_" + test_version;
+            if (!stats.keySet().contains(tk)) {
+                TestStats noveStats = new TestStats(test_name, test_version);
+                noveStats.addQuestionStat(question_test_id, stat, db_id);
+                stats.put(tk, noveStats);
+            } else {
+                TestStats testStats = stats.get(tk);
+                testStats.addQuestionStat(question_test_id, stat, db_id);
+            }
+        }
+        cursor.close();
+        return stats;
+    }
+
+    private LocalStatsCursorLoader localCursorLoader = new LocalStatsCursorLoader(this);
+    private static final int LOCAL_STATS_LOADER_ID = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +125,8 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        getLoaderManager().initLoader(LOCAL_STATS_LOADER_ID, Bundle.EMPTY, localCursorLoader);
 
 //        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 //        fab.setOnClickListener(new View.OnClickListener() {
@@ -78,44 +145,15 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        loadTestsFiles();
 
-        TextView statusTextView = (TextView) findViewById(R.id.statusTextView);
-        StringBuilder sb = new StringBuilder("Status:\n");
-        for (Test t : jsonTests) {
-            sb.append(t.name + "\n");
+        // check if there's any retained content fragment, if not, show home
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.content_frame);
+        if (fragment == null) {
+            showContentFragment(new HomeFragment(), HomeFragment.TAG);
+            navigationView.getMenu().getItem(0).setChecked(true);
         }
-        statusTextView.setText(sb.toString());
     }
 
-    private void loadTestsFiles() {
-        String dirPath = getFilesDir().getAbsolutePath();
-        File projDir = new File(dirPath);
-        if (!projDir.exists())
-            projDir.mkdirs();
-        File[] files = projDir.listFiles();
-        jsonTests = new ArrayList<>();
-        jsonTestsInfo = new ArrayList<>();
-
-        for (File f : files) {
-            ObjectMapper mapper = new ObjectMapper();
-            Test test = null;
-            try {
-                test = mapper.readValue(f, Test.class);
-                jsonTests.add(test);
-                TestInformation ti = new TestInformation();
-                ti.answersSize = test.questions.get(0).answers.size();
-                ti.name = test.name;
-                ti.questionsSize = test.questions.size();
-                ti.version = test.version;
-                ti.id = jsonTests.size() - 1;
-                jsonTestsInfo.add(ti);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        Log.d(TAG,"nacitanych testov: "+jsonTests.size());
-    }
 
     @Override
     public void onBackPressed() {
@@ -155,8 +193,8 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
+        if (id == R.id.home) {
+            showContentFragment(new HomeFragment(), HomeFragment.TAG);
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_slideshow) {
@@ -174,182 +212,24 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    public void getTestsInformation(View v) {
-        Toast.makeText(this, "loading test information", Toast.LENGTH_SHORT).show();
-        onDownloadOkhttpClicked();
+    private void showContentFragment(Fragment fragment, String tag) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.content_frame, fragment, tag)
+                .commit();
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        EventBus.getDefault().register(this);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        EventBus.getDefault().unregister(this);
-    }
-
-    private void onDownloadOkhttpClicked() {
-        if (!NetworkUtils.isConnected(this)) {
-            //Toast.makeText(this, "Pripojte sa na internet a zopakujte operáciu.", Toast.LENGTH_SHORT).show();
-            final TextView textView = new TextView(getApplicationContext());
-            textView.setText("Nedá sa pripojiť na server!\nPripojte sa na internet a zopakujte operáciu.");
-            textView.setTextColor(Color.BLACK);
-            textView.setPadding(5, 5, 5, 5);
-            new AlertDialog.Builder(getApplicationContext())
-                    .setTitle("Oznam")
-                    .setView(textView)
-                    .setPositiveButton("OK", null)
-                    .show();
-            return;
-        }
-
-        Request request = new Request.Builder()
-                .url("http://81.2.244.134/~vdesktop/testy/testsInfo.txt")
-                .build();
-
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Log.e(TAG, "onFailure");
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (!response.isSuccessful())
-                    throw new IOException("Unexpected code " + response);
-
-                Headers responseHeaders = response.headers();
-                for (int i = 0, size = responseHeaders.size(); i < size; i++) {
-                    Log.d(TAG, responseHeaders.name(i) + ": " + responseHeaders.value(i));
-                }
-
-                String jsonResponse = response.body().string();
-                Log.d(TAG, jsonResponse);
-                ObjectMapper mapper = new ObjectMapper();
-                List<TestInformation> testsInfo = mapper.readValue(jsonResponse, new TypeReference<List<TestInformation>>() {
-                });
-                List<TestInformation> nove = new ArrayList<>();
-                for (TestInformation ti : testsInfo) {
-                    if (!jsonTestsInfo.contains(ti)) {
-                        nove.add(ti);
-                    }
-                }
-                if (!nove.isEmpty()) {
-                    Log.d(TAG, "spustam stahovanie novych testov size: " + nove.size());
-                    EventBus.getDefault().post(new DownloadEvents.NewTestsToDownload(nove));
-                } else {
-                    final TextView textView = new TextView(getApplicationContext());
-                    textView.setText("Všetky testy sú aktuálne.");
-                    textView.setTextColor(Color.BLACK);
-                    textView.setPadding(5, 5, 5, 5);
-                    new AlertDialog.Builder(getApplicationContext())
-                            .setTitle("Oznam")
-                            .setView(textView)
-                            .setPositiveButton("OK", null)
-                            .show();
-                }
-            }
-        });
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//        EventBus.getDefault().register(this);
+//    }
+//
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+//        EventBus.getDefault().unregister(this);
+//    }
 
 
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onDownloadEvent(final DownloadEvents.NewTestsToDownload noveTestyDownloadEvent) {
-        Log.d(TAG, "onDownloadEvent: treba stiahnut tieto testy: " + noveTestyDownloadEvent.nove);
-        final ProgressDialog dialog = new ProgressDialog(this);
-        dialog.setMessage("Načítavam testy...");
-        dialog.setProgressStyle(dialog.STYLE_HORIZONTAL);
-        dialog.setProgress(0);
-        dialog.setMax(noveTestyDownloadEvent.nove.size());
-        dialog.show();
-
-        new AsyncTask<Void, Void, Void>() {
-
-            @Override
-            protected void onPreExecute() {
-//                dialog.setMessage("Načítavam testy...");
-//                dialog.setProgressStyle(dialog.STYLE_HORIZONTAL);
-//                dialog.setProgress(0);
-//                dialog.setMax(noveTestyDownloadEvent.nove.size());
-               // dialog.show();
-            }
-
-            @Override
-            protected void onPostExecute(Void result) {
-                if (dialog.isShowing()) {
-                    dialog.dismiss();
-                }
-                // este raz sa nacitaju testy aby sa test info obnovilo
-                loadTestsFiles();
-                final TextView textView = new TextView(getApplicationContext());
-                textView.setText("Testy úspešne načítane!");
-                textView.setTextColor(Color.BLACK);
-                textView.setPadding(5, 5, 5, 5);
-                new AlertDialog.Builder(MainActivity.this)
-                        .setTitle("Oznam")
-                        .setView(textView)
-                        .setPositiveButton("OK", null)
-                        .show();
-            }
-
-            @Override
-            protected void onProgressUpdate(Void... values) {
-                super.onProgressUpdate(values);
-            }
-
-            @Override
-            protected Void doInBackground(Void... params) {
-                for (TestInformation ti : noveTestyDownloadEvent.nove) {
-                    Request request = new Request.Builder()
-                            .url("http://81.2.244.134/~vdesktop/testy/" + ti.id + ".txt")
-                            .build();
-                    client.newCall(request).enqueue(new Callback() {
-                        @Override
-                        public void onFailure(Call call, IOException e) {
-                            Log.e(TAG, "onFailure");
-                            //TODO: ohandlovat chybu
-                        }
-
-                        @Override
-                        public void onResponse(Call call, Response response) throws IOException {
-                            if (!response.isSuccessful())
-                                throw new IOException("Unexpected code " + response);
-
-                            Headers responseHeaders = response.headers();
-                            for (int i = 0, size = responseHeaders.size(); i < size; i++) {
-                                Log.d(TAG, responseHeaders.name(i) + ": " + responseHeaders.value(i));
-                            }
-
-                            String responseJson = response.body().string();
-                            Log.d(TAG, responseJson);
-                            FileOutputStream outputStream;
-                            //String dirPath = getFilesDir().getAbsolutePath();
-                            String filename = "test" + jsonTests.size();
-                            Log.d(TAG,"filename=["+filename+"]");
-
-                            try {
-                                outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
-                                //outputStream=new FileOutputStream(filename);
-                                outputStream.write(responseJson.getBytes());
-                                outputStream.close();
-                                ObjectMapper mapper = new ObjectMapper();
-                                Test test = mapper.readValue(responseJson, Test.class);
-                                jsonTests.add(test);
-                                Log.d(TAG,"ulozeny test "+test);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    });
-                }
-
-                //TODO: odoslat viacej idciek a vratit viacej testov naraz
-                return null;
-            }
-        }.execute();
-    }
 }

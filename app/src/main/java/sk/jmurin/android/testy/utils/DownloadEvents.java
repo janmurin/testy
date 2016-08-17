@@ -1,4 +1,4 @@
-package sk.jmurin.android.testy;
+package sk.jmurin.android.testy.utils;
 
 import java.util.List;
 
@@ -14,6 +14,12 @@ public final class DownloadEvents {
         public NewTestsToDownload(List<TestInformation> nove) {
             this.nove = nove;
         }
+    }
+
+    public static class NothingToDownload {
+    }
+
+    public static class NewTestsDownloaded {
     }
 
 //    public static class Progress {
