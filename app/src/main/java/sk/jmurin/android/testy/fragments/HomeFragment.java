@@ -1,19 +1,15 @@
 package sk.jmurin.android.testy.fragments;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -24,7 +20,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -33,27 +28,18 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.Headers;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import sk.jmurin.android.testy.MainActivity;
-import sk.jmurin.android.testy.SecretProperties;
 import sk.jmurin.android.testy.content.DataContract;
 import sk.jmurin.android.testy.entities.TestStats;
 import sk.jmurin.android.testy.utils.DownloadEvents;
@@ -61,7 +47,6 @@ import sk.jmurin.android.testy.utils.NetworkUtils;
 import sk.jmurin.android.testy.R;
 import sk.jmurin.android.testy.entities.Test;
 import sk.jmurin.android.testy.entities.TestInformation;
-import sk.jmurin.android.testy.utils.Utils;
 
 public class HomeFragment extends Fragment {
 
