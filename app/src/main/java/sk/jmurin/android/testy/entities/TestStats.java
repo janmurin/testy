@@ -1,11 +1,12 @@
 package sk.jmurin.android.testy.entities;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Created by jan.murin on 17-Aug-16.
  */
-public class TestStats {
+public class TestStats implements Serializable{
     public final String test_name;
     public final int test_version;
     public final ArrayList<QuestionStat> stats = new ArrayList<>();

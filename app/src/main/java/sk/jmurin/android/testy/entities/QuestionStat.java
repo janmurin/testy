@@ -1,9 +1,11 @@
 package sk.jmurin.android.testy.entities;
 
+import java.io.Serializable;
+
 /**
  * Created by jan.murin on 17-Aug-16.
  */
-public class QuestionStat {
+public class QuestionStat implements Serializable{
     public final int db_id;
     public final int test_id;
     public final int stat;

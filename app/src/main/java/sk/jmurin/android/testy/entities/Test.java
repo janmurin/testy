@@ -1,12 +1,13 @@
 package sk.jmurin.android.testy.entities;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by jan.murin on 15-Aug-16.
  */
-public class Test {
+public class Test implements Serializable{
     public String name;
     public int version;
     public List<Question> questions=new ArrayList<>();

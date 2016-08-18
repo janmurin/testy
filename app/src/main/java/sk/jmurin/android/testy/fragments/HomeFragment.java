@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -40,6 +41,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import sk.jmurin.android.testy.MainActivity;
+import sk.jmurin.android.testy.Secrets;
 import sk.jmurin.android.testy.content.DataContract;
 import sk.jmurin.android.testy.entities.TestStats;
 import sk.jmurin.android.testy.utils.DownloadEvents;
@@ -157,27 +159,9 @@ public class HomeFragment extends Fragment {
     }
 
     private void setupRecyclerView(RecyclerView recyclerView, Map<String, TestStats> testStats) {
-        String[][] vals = new String[jsonTests.size()][2];
-        for (int i = 0; i < jsonTests.size(); i++) {
-            Test t = jsonTests.get(i);
-            TestStats ts = testStats.get(t.name + "_" + t.version);
-            int percento = 0;
-            if (ts != null) {
-                for (int j = 0; j < ts.stats.size(); j++) {
-                    int stat = ts.stats.get(j).stat;
-                    if (stat >= 0) {
-                        percento += stat;
-                    }
-                }
-                percento = (int) (percento / (double) (ts.stats.size() * 3) * 100);
-            } else {
-                throw new RuntimeException("nenaslo test stat");
-            }
-            vals[i][0] = t.name;
-            vals[i][1] = percento + "%";
-        }
+
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
-        recyclerView.setAdapter(new SimpleStringRecyclerViewAdapter(getActivity(), vals));
+        recyclerView.setAdapter(new SimpleStringRecyclerViewAdapter(getActivity(), jsonTests, testStats));
     }
 
     private Map<String, TestStats> getStatsFrom(Cursor cursor) {
@@ -219,7 +203,7 @@ public class HomeFragment extends Fragment {
         }
 
         Request request = new Request.Builder()
-                .url(SecretProperties.DOMAIN + "/testy/testsInfo.txt")
+                .url(Secrets.DOMAIN + "/testy/testsInfo.txt")
                 .build();
 
         client.newCall(request).enqueue(new Callback() {
@@ -348,8 +332,37 @@ public class HomeFragment extends Fragment {
 
         private final TypedValue mTypedValue = new TypedValue();
         private final MainActivity context;
+        private final List<Test> tests;
+        private final String[][] vals;
+        private final Map<String, TestStats> testStats;
         private int mBackground;
-        private String[][] mValues;
+
+        public SimpleStringRecyclerViewAdapter(Context context, List<Test> jsonTests, Map<String, TestStats> testStats) {
+            context.getTheme().resolveAttribute(R.attr.selectableItemBackground, mTypedValue, true);
+            this.context = (MainActivity) context;
+            mBackground = mTypedValue.resourceId;
+            this.tests = jsonTests;
+            this.testStats = testStats;
+            vals = new String[jsonTests.size()][2];
+            for (int i = 0; i < jsonTests.size(); i++) {
+                Test t = jsonTests.get(i);
+                TestStats ts = testStats.get(t.name + "_" + t.version);
+                int percento = 0;
+                if (ts != null) {
+                    for (int j = 0; j < ts.stats.size(); j++) {
+                        int stat = ts.stats.get(j).stat;
+                        if (stat >= 0) {
+                            percento += stat;
+                        }
+                    }
+                    percento = (int) (percento / (double) (ts.stats.size() * 3) * 100);
+                } else {
+                    throw new RuntimeException("nenaslo test stat");
+                }
+                vals[i][0] = t.name;
+                vals[i][1] = percento + "%";
+            }
+        }
 
         public static class ViewHolder extends RecyclerView.ViewHolder {
 //            public String mBoundString;
@@ -374,15 +387,15 @@ public class HomeFragment extends Fragment {
         }
 
         public String getValueAt(int position) {
-            return mValues[position][0];
+            return vals[position][0];
         }
 
-        public SimpleStringRecyclerViewAdapter(Context context, String[][] items) {
-            context.getTheme().resolveAttribute(R.attr.selectableItemBackground, mTypedValue, true);
-            this.context = (MainActivity) context;
-            mBackground = mTypedValue.resourceId;
-            mValues = items;
-        }
+//        public SimpleStringRecyclerViewAdapter(Context context, String[][] items) {
+//            context.getTheme().resolveAttribute(R.attr.selectableItemBackground, mTypedValue, true);
+//            this.context = (MainActivity) context;
+//            mBackground = mTypedValue.resourceId;
+//            mValues = items;
+//        }
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -395,8 +408,8 @@ public class HomeFragment extends Fragment {
         public void onBindViewHolder(final ViewHolder holder, final int position) {
             //holder.mBoundString = mValues.get(position);
             holder.numberTextView.setText((position + 1) + ".");
-            holder.testNameTextView.setText(mValues[position][0]);
-            holder.scoreTextView.setText(mValues[position][1]);
+            holder.testNameTextView.setText(vals[position][0]);
+            holder.scoreTextView.setText(vals[position][1]);
 //            holder.scoreTextView.setTypeface(tf);
 
             holder.mView.setOnClickListener(new View.OnClickListener() {
@@ -404,7 +417,8 @@ public class HomeFragment extends Fragment {
                 public void onClick(View v) {
                     Log.d(TAG, "start test activity");
                     FragmentManager fragmentManager = context.getSupportFragmentManager();
-                    TestParametersDialogFragment newFragment = TestParametersDialogFragment.newInstance(json);
+                    Test test = tests.get(position);
+                    TestParametersDialogFragment newFragment = TestParametersDialogFragment.newInstance(test, testStats.get(test.name + "_" + test.version));
 
                     // The device is using a large layout, so show the fragment as a dialog
                     newFragment.show(fragmentManager, TestParametersDialogFragment.TAG);
@@ -419,7 +433,7 @@ public class HomeFragment extends Fragment {
 
         @Override
         public int getItemCount() {
-            return mValues.length;
+            return vals.length;
         }
     }
 

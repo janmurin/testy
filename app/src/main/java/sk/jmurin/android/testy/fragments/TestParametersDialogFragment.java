@@ -5,7 +5,6 @@ import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.widget.TextViewCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,10 +16,9 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import sk.jmurin.android.testy.R;
+import sk.jmurin.android.testy.entities.Test;
+import sk.jmurin.android.testy.entities.TestStats;
 
 /**
  * Created by jan.murin on 18-Aug-16.
@@ -43,20 +41,18 @@ public class TestParametersDialogFragment extends DialogFragment {
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    public static final String TAG = ProgressDialogFragment.class.getSimpleName();
-    private ArrayList<Integer> ids;
-    private ProgressDialog dialog;
-    private int testsSize;
+    private Test test;
+    private TestStats testStats;
 
     public TestParametersDialogFragment() {
         // Required empty public constructor
     }
 
-    public static TestParametersDialogFragment newInstance(List<Integer> ids, int testsSize) {
+    public static TestParametersDialogFragment newInstance(Test test, TestStats testsStats) {
         TestParametersDialogFragment fragment = new TestParametersDialogFragment();
         Bundle args = new Bundle();
-        args.putIntegerArrayList(ARG_PARAM1, (ArrayList<Integer>) ids);
-        args.putInt(ARG_PARAM2, testsSize);
+        args.putSerializable(ARG_PARAM1, test);
+        args.putSerializable(ARG_PARAM2, testsStats);
         fragment.setArguments(args);
         return fragment;
     }
@@ -65,8 +61,8 @@ public class TestParametersDialogFragment extends DialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            ids = getArguments().getIntegerArrayList(ARG_PARAM1);
-            testsSize = getArguments().getInt(ARG_PARAM2);
+            test = (Test) getArguments().getSerializable(ARG_PARAM1);
+            testStats = (TestStats) getArguments().getSerializable(ARG_PARAM2);
         }
         setCancelable(true);
     }
@@ -84,7 +80,7 @@ public class TestParametersDialogFragment extends DialogFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         TextView infoTextView = (TextView) view.findViewById(R.id.infoTextView);
-        infoTextView.setText("");
+        infoTextView.setText(test.name+" "+test.version+"\notazok: "+test.questions.size()+"\n"+testStats.stats);
 //        vsetkyRadioButton = (RadioButton) view.findViewById(R.id.vsetkyRadioButton);
 //        vybraneRadioButton = (RadioButton) view.findViewById(R.id.vybraneRadioButton);
 //        rozsahLayout = (LinearLayout) view.findViewById(R.id.rozsahLayout);
