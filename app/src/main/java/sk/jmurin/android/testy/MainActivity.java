@@ -57,67 +57,67 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    private class LocalStatsCursorLoader implements LoaderManager.LoaderCallbacks<Cursor> {
-        MainActivity parent;
-
-        public LocalStatsCursorLoader(MainActivity main) {
-            this.parent = main;
-        }
-
-        @Override
-        public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
-            if (id == LOCAL_STATS_LOADER_ID) {
-                System.out.println("creating stats loader");
-                CursorLoader loader = new CursorLoader(parent);
-                Uri uri = DataContract.QuestionStats.CONTENT_URI
-                        .buildUpon()
-                        .build();
-                loader.setUri(uri);
-                return loader;
-            }
-            return null;
-        }
-
-        @Override
-        public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-            if (loader.getId() == LOCAL_STATS_LOADER_ID) {
-                App.testStatsMap = getStatsFrom(cursor);
-                Log.d(TAG, "stats loader finished, loaded stats size: " + App.testStatsMap.size());
-            }
-        }
-
-        @Override
-        public void onLoaderReset(Loader<Cursor> loader) {
-
-        }
-
-    }
-
-    private Map<String, TestStats> getStatsFrom(Cursor cursor) {
-        System.out.println("getStatsFrom actionPerformed");
-        Map<String, TestStats> stats = new HashMap<>();
-        while (cursor.moveToNext()) {
-            int stat = cursor.getInt(cursor.getColumnIndex(DataContract.QuestionStats.STAT));
-            int db_id = cursor.getInt(cursor.getColumnIndex(DataContract.QuestionStats._ID));
-            int question_test_id = cursor.getInt(cursor.getColumnIndex(DataContract.QuestionStats.QUESTION_TEST_ID));
-            String test_name = cursor.getString(cursor.getColumnIndex(DataContract.QuestionStats.TEST_NAME));
-            int test_version = cursor.getInt(cursor.getColumnIndex(DataContract.QuestionStats.TEST_VERSION));
-            String tk = test_name + "_" + test_version;
-            if (!stats.keySet().contains(tk)) {
-                TestStats noveStats = new TestStats(test_name, test_version);
-                noveStats.addQuestionStat(question_test_id, stat, db_id);
-                stats.put(tk, noveStats);
-            } else {
-                TestStats testStats = stats.get(tk);
-                testStats.addQuestionStat(question_test_id, stat, db_id);
-            }
-        }
-        cursor.close();
-        return stats;
-    }
-
-    private LocalStatsCursorLoader localCursorLoader = new LocalStatsCursorLoader(this);
-    private static final int LOCAL_STATS_LOADER_ID = 2;
+//    private class LocalStatsCursorLoader implements LoaderManager.LoaderCallbacks<Cursor> {
+//        MainActivity parent;
+//
+//        public LocalStatsCursorLoader(MainActivity main) {
+//            this.parent = main;
+//        }
+//
+//        @Override
+//        public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
+//            if (id == LOCAL_STATS_LOADER_ID) {
+//                System.out.println("creating stats loader");
+//                CursorLoader loader = new CursorLoader(parent);
+//                Uri uri = DataContract.QuestionStats.CONTENT_URI
+//                        .buildUpon()
+//                        .build();
+//                loader.setUri(uri);
+//                return loader;
+//            }
+//            return null;
+//        }
+//
+//        @Override
+//        public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+//            if (loader.getId() == LOCAL_STATS_LOADER_ID) {
+//                App.testStatsMap = getStatsFrom(cursor);
+//                Log.d(TAG, "stats loader finished, loaded stats size: " + App.testStatsMap.size());
+//            }
+//        }
+//
+//        @Override
+//        public void onLoaderReset(Loader<Cursor> loader) {
+//            Log.d(TAG,"onLoaderReset(Loader<Cursor> loader)");
+//        }
+//
+//    }
+//
+//    private Map<String, TestStats> getStatsFrom(Cursor cursor) {
+//        System.out.println("getStatsFrom actionPerformed");
+//        Map<String, TestStats> stats = new HashMap<>();
+//        while (cursor.moveToNext()) {
+//            int stat = cursor.getInt(cursor.getColumnIndex(DataContract.QuestionStats.STAT));
+//            int db_id = cursor.getInt(cursor.getColumnIndex(DataContract.QuestionStats._ID));
+//            int question_test_id = cursor.getInt(cursor.getColumnIndex(DataContract.QuestionStats.QUESTION_TEST_ID));
+//            String test_name = cursor.getString(cursor.getColumnIndex(DataContract.QuestionStats.TEST_NAME));
+//            int test_version = cursor.getInt(cursor.getColumnIndex(DataContract.QuestionStats.TEST_VERSION));
+//            String tk = test_name + "_" + test_version;
+//            if (!stats.keySet().contains(tk)) {
+//                TestStats noveStats = new TestStats(test_name, test_version);
+//                noveStats.addQuestionStat(question_test_id, stat, db_id);
+//                stats.put(tk, noveStats);
+//            } else {
+//                TestStats testStats = stats.get(tk);
+//                testStats.addQuestionStat(question_test_id, stat, db_id);
+//            }
+//        }
+//        cursor.close();
+//        return stats;
+//    }
+//
+//    private LocalStatsCursorLoader localCursorLoader = new LocalStatsCursorLoader(this);
+//    private static final int LOCAL_STATS_LOADER_ID = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,9 +125,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        getLoaderManager().initLoader(LOCAL_STATS_LOADER_ID, Bundle.EMPTY, localCursorLoader);
-
+//
+//        if(savedInstanceState!=null){
+//            getLoaderManager().restartLoader(LOCAL_STATS_LOADER_ID, Bundle.EMPTY, localCursorLoader);
+//        }else {
+//            getLoaderManager().initLoader(LOCAL_STATS_LOADER_ID, Bundle.EMPTY, localCursorLoader);
+//        }
 //        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 //        fab.setOnClickListener(new View.OnClickListener() {
 //            @Override

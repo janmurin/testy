@@ -151,13 +151,14 @@ public class ProgressDialogFragment extends DialogFragment {
                             for (Question q : test.questions) {
                                 ContentValues values = new ContentValues();
                                 values.put(DataContract.QuestionStats.QUESTION_TEST_ID, question_test_id);
-                                values.put(DataContract.QuestionStats.STAT, 0);
+                                values.put(DataContract.QuestionStats.STAT, (int)(Math.random()*5-1));
                                 values.put(DataContract.QuestionStats.TEST_NAME, test.name);
                                 values.put(DataContract.QuestionStats.TEST_VERSION, test.version);
                                 contentValues.add(values);
                                 question_test_id++;
                             }
-                            getActivity().getContentResolver().bulkInsert(insertUri, contentValues.toArray(new ContentValues[contentValues.size()]));
+                            int inserted = getActivity().getContentResolver().bulkInsert(insertUri, contentValues.toArray(new ContentValues[contentValues.size()]));
+                            Log.d(TAG,"inserted QuestionStats rows: "+inserted);
                         } catch (Exception e) {
                             e.printStackTrace();
                             // TODO: ohandlovat chybu ze sa nepodarilo naparsovat resource z rest servera

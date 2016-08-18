@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -11,6 +12,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -38,6 +41,7 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -49,6 +53,9 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import sk.jmurin.android.testy.MainActivity;
+import sk.jmurin.android.testy.SecretProperties;
+import sk.jmurin.android.testy.content.DataContract;
+import sk.jmurin.android.testy.entities.TestStats;
 import sk.jmurin.android.testy.utils.DownloadEvents;
 import sk.jmurin.android.testy.utils.NetworkUtils;
 import sk.jmurin.android.testy.R;
@@ -56,17 +63,8 @@ import sk.jmurin.android.testy.entities.Test;
 import sk.jmurin.android.testy.entities.TestInformation;
 import sk.jmurin.android.testy.utils.Utils;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link HomeFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link HomeFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class HomeFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     public static final String TAG = HomeFragment.class.getSimpleName();
@@ -74,7 +72,6 @@ public class HomeFragment extends Fragment {
     private List<Test> jsonTests;
     private List<TestInformation> jsonTestsInfo;
 
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
@@ -82,28 +79,29 @@ public class HomeFragment extends Fragment {
     private TextView statusTextView;
     private Button downloadOkhttpBtn;
     private RecyclerView rv;
+    private boolean mIsLargeLayout;
 
     public HomeFragment() {
         // Required empty public constructor
     }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment HomeFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static HomeFragment newInstance(String param1, String param2) {
-        HomeFragment fragment = new HomeFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+//
+//    /**
+//     * Use this factory method to create a new instance of
+//     * this fragment using the provided parameters.
+//     *
+//     * @param param1 Parameter 1.
+//     * @param param2 Parameter 2.
+//     * @return A new instance of fragment HomeFragment.
+//     */
+//    // TODO: Rename and change types and number of parameters
+//    public static HomeFragment newInstance(String param1, String param2) {
+//        HomeFragment fragment = new HomeFragment();
+//        Bundle args = new Bundle();
+//        args.putString(ARG_PARAM1, param1);
+//        args.putString(ARG_PARAM2, param2);
+//        fragment.setArguments(args);
+//        return fragment;
+//    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -112,6 +110,7 @@ public class HomeFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        mIsLargeLayout = getResources().getBoolean(R.bool.large_layout);
     }
 
     @Override
@@ -140,15 +139,6 @@ public class HomeFragment extends Fragment {
         loadTestsFiles();
     }
 
-    private void updateTestsList() {
-//        StringBuilder sb = new StringBuilder("Status:\n");
-//        for (Test t : jsonTests) {
-//            sb.append(t.name + "\n");
-//        }
-//        statusTextView.setText(sb.toString());
-        setupRecyclerView(rv);
-        Log.d(TAG, "tests list updated");
-    }
 
     private synchronized void loadTestsFiles() {
         String dirPath = getActivity().getFilesDir().getAbsolutePath();
@@ -174,7 +164,58 @@ public class HomeFragment extends Fragment {
             }
         }
         Log.d(TAG, "nacitanych testov: " + jsonTests.size());
-        updateTestsList();
+        Cursor cursor = getActivity().getContentResolver().query(DataContract.QuestionStats.CONTENT_URI, null, null, null, DataContract.QuestionStats._ID);
+        Map<String, TestStats> testStats = getStatsFrom(cursor);
+
+        setupRecyclerView(rv, testStats);
+        Log.d(TAG, "tests list updated");
+    }
+
+    private void setupRecyclerView(RecyclerView recyclerView, Map<String, TestStats> testStats) {
+        String[][] vals = new String[jsonTests.size()][2];
+        for (int i = 0; i < jsonTests.size(); i++) {
+            Test t = jsonTests.get(i);
+            TestStats ts = testStats.get(t.name + "_" + t.version);
+            int percento = 0;
+            if (ts != null) {
+                for (int j = 0; j < ts.stats.size(); j++) {
+                    int stat = ts.stats.get(j).stat;
+                    if (stat >= 0) {
+                        percento += stat;
+                    }
+                }
+                percento = (int) (percento / (double) (ts.stats.size() * 3) * 100);
+            } else {
+                throw new RuntimeException("nenaslo test stat");
+            }
+            vals[i][0] = t.name;
+            vals[i][1] = percento + "%";
+        }
+        recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
+        recyclerView.setAdapter(new SimpleStringRecyclerViewAdapter(getActivity(), vals));
+    }
+
+    private Map<String, TestStats> getStatsFrom(Cursor cursor) {
+        System.out.println("getStatsFrom actionPerformed");
+        Map<String, TestStats> stats = new HashMap<>();
+        while (cursor.moveToNext()) {
+            int stat = cursor.getInt(cursor.getColumnIndex(DataContract.QuestionStats.STAT));
+            int db_id = cursor.getInt(cursor.getColumnIndex(DataContract.QuestionStats._ID));
+            int question_test_id = cursor.getInt(cursor.getColumnIndex(DataContract.QuestionStats.QUESTION_TEST_ID));
+            String test_name = cursor.getString(cursor.getColumnIndex(DataContract.QuestionStats.TEST_NAME));
+            int test_version = cursor.getInt(cursor.getColumnIndex(DataContract.QuestionStats.TEST_VERSION));
+            String tk = test_name + "_" + test_version;
+            if (!stats.keySet().contains(tk)) {
+                TestStats noveStats = new TestStats(test_name, test_version);
+                noveStats.addQuestionStat(question_test_id, stat, db_id);
+                stats.put(tk, noveStats);
+            } else {
+                TestStats testStats = stats.get(tk);
+                testStats.addQuestionStat(question_test_id, stat, db_id);
+            }
+        }
+        cursor.close();
+        return stats;
     }
 
     private void onDownloadOkhttpClicked() {
@@ -193,7 +234,7 @@ public class HomeFragment extends Fragment {
         }
 
         Request request = new Request.Builder()
-                .url("http://81.2.244.134/~vdesktop/testy/testsInfo.txt")
+                .url(SecretProperties.DOMAIN + "/testy/testsInfo.txt")
                 .build();
 
         client.newCall(request).enqueue(new Callback() {
@@ -265,7 +306,7 @@ public class HomeFragment extends Fragment {
      * fragment to allow an interaction in this fragment to be communicated
      * to the activity and potentially other fragments contained in that
      * activity.
-     * <p/>
+     * <p>
      * See the Android Training lesson <a href=
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
@@ -309,8 +350,8 @@ public class HomeFragment extends Fragment {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onDownloadEvent(DownloadEvents.NewTestsToDownload noveTestyDownloadEvent) {
         Log.d(TAG, "onDownloadEvent: treba stiahnut tieto testy: " + noveTestyDownloadEvent.nove);
-        List<Integer> ids=new ArrayList<>();
-        for(TestInformation ti:noveTestyDownloadEvent.nove){
+        List<Integer> ids = new ArrayList<>();
+        for (TestInformation ti : noveTestyDownloadEvent.nove) {
             ids.add(ti.id);
         }
         DialogFragment dialog = ProgressDialogFragment.newInstance(ids, jsonTests.size());
@@ -318,20 +359,10 @@ public class HomeFragment extends Fragment {
     }
 
 
-    private void setupRecyclerView(RecyclerView recyclerView) {
-        String[][] vals = new String[jsonTests.size()][2];
-        for (int i = 0; i < jsonTests.size(); i++) {
-            Test t = jsonTests.get(i);
-            vals[i][0] = t.name;
-            vals[i][1] = "0%";
-        }
-        recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
-        recyclerView.setAdapter(new SimpleStringRecyclerViewAdapter(getActivity(), vals));
-    }
-
     public static class SimpleStringRecyclerViewAdapter extends RecyclerView.Adapter<SimpleStringRecyclerViewAdapter.ViewHolder> {
 
         private final TypedValue mTypedValue = new TypedValue();
+        private final MainActivity context;
         private int mBackground;
         private String[][] mValues;
 
@@ -363,6 +394,7 @@ public class HomeFragment extends Fragment {
 
         public SimpleStringRecyclerViewAdapter(Context context, String[][] items) {
             context.getTheme().resolveAttribute(R.attr.selectableItemBackground, mTypedValue, true);
+            this.context = (MainActivity) context;
             mBackground = mTypedValue.resourceId;
             mValues = items;
         }
@@ -386,11 +418,11 @@ public class HomeFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     Log.d(TAG, "start test activity");
-//                    Context context = v.getContext();
-//                    Intent intent = new Intent(context, PagerActivity2.class);
-//                    intent.putExtra(PagerActivity2.MENU_ID, position);
-//
-//                    context.startActivity(intent);
+                    FragmentManager fragmentManager = context.getSupportFragmentManager();
+                    TestParametersDialogFragment newFragment = TestParametersDialogFragment.newInstance(json);
+
+                    // The device is using a large layout, so show the fragment as a dialog
+                    newFragment.show(fragmentManager, TestParametersDialogFragment.TAG);
                 }
             });
 
@@ -405,4 +437,24 @@ public class HomeFragment extends Fragment {
             return mValues.length;
         }
     }
+
+//    private void startDialogFragment(){
+//        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+//        TestParametersDialogFragment newFragment = new TestParametersDialogFragment();
+//
+//        if (mIsLargeLayout) {
+//            // The device is using a large layout, so show the fragment as a dialog
+//            newFragment.show(fragmentManager, TestParametersDialogFragment.TAG);
+//        } else {
+//            newFragment.show(fragmentManager, TestParametersDialogFragment.TAG);
+////            // The device is smaller, so show the fragment fullscreen
+////            FragmentTransaction transaction = fragmentManager.beginTransaction();
+////            // For a little polish, specify a transition animation
+////            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+////            // To make it fullscreen, use the 'content' root view as the container
+////            // for the fragment, which is always the root view for the activity
+////            transaction.add(android.R.id.content, newFragment)
+////                    .addToBackStack(null).commit();
+//        }
+//    }
 }

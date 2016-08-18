@@ -86,8 +86,10 @@ public final class DbUtils {
                 switch (c.type) {
                     case TYPE_INT:
                         ddl.append(" INTEGER ");
+                        break;
                     case TYPE_TEXT:
                         ddl.append(" TEXT ");
+                        break;
                 }
                 if (c.notNull) {
                     ddl.append(" NOT NULL");
