@@ -144,6 +144,10 @@ public class MyContentProvider extends ContentProvider {
             case DataContract.Codes.QUESTIONS:
                 updateCount = db.update(DataContract.Tables.QUESTION_STATS, values, selection, selectionArgs);
                 break;
+            case DataContract.Codes.QUESTIONS_ID:
+                int id = Integer.parseInt(uri.getLastPathSegment());
+                updateCount = db.update(DataContract.Tables.QUESTION_STATS, values, DataContract.QuestionStats._ID + "=" + id, selectionArgs);
+                break;
             default:
                 throw new IllegalArgumentException("Unsupported URI: " + uri);
         }

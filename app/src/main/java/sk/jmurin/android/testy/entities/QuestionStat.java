@@ -8,7 +8,7 @@ import java.io.Serializable;
 public class QuestionStat implements Serializable{
     public final int db_id;
     public final int test_id;
-    public final int stat;
+    public int stat;
 
     /**
      *
@@ -20,5 +20,14 @@ public class QuestionStat implements Serializable{
         this.db_id = db_id;
         this.test_id = test_id;
         this.stat = stat;
+    }
+
+    @Override
+    public String toString() {
+        return "QuestionStat{" +
+                "db_id=" + db_id +
+                ", test_id=" + test_id +
+                ", stat=" + stat +
+                '}';
     }
 }

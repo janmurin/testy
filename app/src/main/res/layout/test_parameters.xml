@@ -169,29 +169,29 @@
 
         <!--</LinearLayout>-->
 
-        <!--<RelativeLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:orientation="horizontal">-->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-            <!--<Button-->
-                <!--android:id="@+id/zrusitTestButton"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_alignParentLeft="true"-->
-                <!--android:layout_gravity="left"-->
-                <!--android:enabled="true"-->
-                <!--android:text="zrusit" />-->
+            <Button
+                android:id="@+id/zrusitTestButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_gravity="left"
+                android:enabled="true"
+                android:text="zrusit" />
 
-            <!--<Button-->
-                <!--android:id="@+id/zacniTestButton"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_alignParentRight="true"-->
-                <!--android:layout_gravity="right"-->
-                <!--android:enabled="true"-->
-                <!--android:text="začni test" />-->
-        <!--</RelativeLayout>-->
+            <Button
+                android:id="@+id/zacniTestButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_gravity="right"
+                android:enabled="true"
+                android:text="začni test" />
+        </RelativeLayout>
 
 
     <!--</LinearLayout>-->

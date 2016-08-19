@@ -24,8 +24,10 @@
         </activity>
 
         <provider
-            android:authorities="sk.jmurin.android.testy"
-            android:name=".content.MyContentProvider"/>
+            android:name=".content.MyContentProvider"
+            android:authorities="sk.jmurin.android.testy" />
+
+        <activity android:name=".QuestionActivity"></activity>
     </application>
 
 </manifest>

@@ -80,7 +80,6 @@ public class HomeFragment extends Fragment {
 //     * @param param2 Parameter 2.
 //     * @return A new instance of fragment HomeFragment.
 //     */
-//    // TODO: Rename and change types and number of parameters
 //    public static HomeFragment newInstance(String param1, String param2) {
 //        HomeFragment fragment = new HomeFragment();
 //        Bundle args = new Bundle();
@@ -143,6 +142,10 @@ public class HomeFragment extends Fragment {
             ObjectMapper mapper = new ObjectMapper();
             try {
                 Test test = mapper.readValue(f, Test.class);
+                // nastavime kazdej otazke idcko podla toho v akom poradi bolo nacitane zo suboru
+                for (int i = 0; i < test.questions.size(); i++) {
+                    test.questions.get(i).id = i;
+                }
                 jsonTests.add(test);
                 TestInformation ti = new TestInformation(test, jsonTests.size() - 1);
                 jsonTestsInfo.add(ti);
@@ -151,18 +154,19 @@ public class HomeFragment extends Fragment {
             }
         }
         Log.d(TAG, "nacitanych testov: " + jsonTests.size());
+        refreshRecyclerView();
+    }
+
+    private void refreshRecyclerView() {
+        Log.d(TAG,"refreshRecyclerView()");
         Cursor cursor = getActivity().getContentResolver().query(DataContract.QuestionStats.CONTENT_URI, null, null, null, DataContract.QuestionStats._ID);
         Map<String, TestStats> testStats = getStatsFrom(cursor);
 
-        setupRecyclerView(rv, testStats);
-        Log.d(TAG, "tests list updated");
+        rv.setLayoutManager(new LinearLayoutManager(rv.getContext()));
+        rv.setAdapter(new SimpleStringRecyclerViewAdapter(getActivity(), jsonTests, testStats));
+        Log.d(TAG, "tests list and stats updated");
     }
 
-    private void setupRecyclerView(RecyclerView recyclerView, Map<String, TestStats> testStats) {
-
-        recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
-        recyclerView.setAdapter(new SimpleStringRecyclerViewAdapter(getActivity(), jsonTests, testStats));
-    }
 
     private Map<String, TestStats> getStatsFrom(Cursor cursor) {
         System.out.println("getStatsFrom actionPerformed");
@@ -289,6 +293,7 @@ public class HomeFragment extends Fragment {
     public void onStart() {
         super.onStart();
         EventBus.getDefault().register(this);
+        refreshRecyclerView();
     }
 
     @Override
@@ -416,19 +421,15 @@ public class HomeFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     Log.d(TAG, "start test activity");
+                    //TODO: pouzit embedded dialog na velke layouty
                     FragmentManager fragmentManager = context.getSupportFragmentManager();
                     Test test = tests.get(position);
                     TestParametersDialogFragment newFragment = TestParametersDialogFragment.newInstance(test, testStats.get(test.name + "_" + test.version));
-
-                    // The device is using a large layout, so show the fragment as a dialog
                     newFragment.show(fragmentManager, TestParametersDialogFragment.TAG);
+
                 }
             });
 
-//            Glide.with(holder.testNameTextView.getContext())
-//                    .load(Database.getButtonDrawable(position))
-//                    .fitCenter()
-//                    .into(holder.testNameTextView);
         }
 
         @Override

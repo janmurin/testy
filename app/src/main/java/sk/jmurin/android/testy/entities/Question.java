@@ -10,12 +10,14 @@ import java.util.List;
 public class Question implements Serializable{
     public String question;
     public List<Answer> answers=new ArrayList<>();
+    public int id;
 
     @Override
     public String toString() {
         return "Question{" +
                 "question='" + question + '\'' +
-                ", answersSize=" + answers +
+                ", answers=" + answers +
+                ", id=" + id +
                 '}';
     }
 }
