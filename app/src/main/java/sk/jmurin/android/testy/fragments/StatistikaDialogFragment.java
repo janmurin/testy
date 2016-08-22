@@ -59,8 +59,7 @@ public class StatistikaDialogFragment extends DialogFragment {
     private Statistika getStatistika(InstanciaTestu instanciaTestu) {
         Statistika st = new Statistika();
         st.minusBodov = instanciaTestu.pocetMinusBodov;
-        DecimalFormat df = new DecimalFormat("##.##");
-        st.uspesnost = Double.parseDouble(df.format(instanciaTestu.uspesnych / (double) instanciaTestu.getOhodnotenych() * 100));
+        st.uspesnost = instanciaTestu.uspesnych / (double) instanciaTestu.getOhodnotenych() * 100;
         st.uspesnych = instanciaTestu.uspesnych;
         st.vyriesenych = instanciaTestu.getOhodnotenych();
         st.zleZodpovedane = instanciaTestu.getZleZodpovedane();
@@ -83,9 +82,10 @@ public class StatistikaDialogFragment extends DialogFragment {
         super.onViewCreated(view, savedInstanceState);
         final Statistika statistika = getStatistika(instanciaTestu);
         TextView infoTextView = (TextView) view.findViewById(R.id.infoTextView);
+        DecimalFormat df=new DecimalFormat("##.##");
         String textik = "Vyriešených otázok: " + statistika.vyriesenych + "\n" +
                 "Úspešných: otázok: " + statistika.uspesnych + "\n" +
-                "Úspešnosť: " + statistika.uspesnost + " %\n" +
+                "Úspešnosť: " + df.format(statistika.uspesnost) + " %\n" +
                 "Mínus bodov: " + statistika.minusBodov + "\n" +
                 "cervenych: " + String.format("%+d", statistika.pribudlo[0]) + "\n" +
                 "bielych: " + String.format("%+d", statistika.pribudlo[1]) + "\n" +
@@ -94,7 +94,11 @@ public class StatistikaDialogFragment extends DialogFragment {
                 "zelenych: " + String.format("%+d", statistika.pribudlo[4]);
         infoTextView.setText(textik);
         zacniTestButton = (Button) view.findViewById(R.id.zacniTestButton);
-        zacniTestButton.setText("znova prejst (" + statistika.zleZodpovedane.length + ")");
+        if(statistika.zleZodpovedane.length>0) {
+            zacniTestButton.setText("znova prejst (" + statistika.zleZodpovedane.length + ")");
+        }else{
+            zacniTestButton.setVisibility(View.GONE);
+        }
         zacniTestButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -120,6 +124,7 @@ public class StatistikaDialogFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 dismiss();
+                getActivity().finish();
             }
         });
     }

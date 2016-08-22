@@ -7,10 +7,11 @@ import java.util.List;
 /**
  * Created by jan.murin on 15-Aug-16.
  */
-public class Test implements Serializable{
+public class Test implements Serializable {
     public String name;
     public int version;
-    public List<Question> questions=new ArrayList<>();
+    public boolean isSingleAnswer = true;
+    public List<Question> questions = new ArrayList<>();
 
 
     @Override
@@ -18,7 +19,8 @@ public class Test implements Serializable{
         return "Test{" +
                 "name='" + name + '\'' +
                 ", version=" + version +
-                ", questionsSize=" + questions +
+                ", isSingleAnswer=" + isSingleAnswer +
+                ", questions=" + questions +
                 '}';
     }
 

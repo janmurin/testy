@@ -1,7 +1,6 @@
 package sk.jmurin.android.testy.fragments;
 
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -9,17 +8,23 @@ import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
+import android.widget.Spinner;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import sk.jmurin.android.testy.InstanciaTestu;
 import sk.jmurin.android.testy.QuestionActivity;
 import sk.jmurin.android.testy.R;
+import sk.jmurin.android.testy.entities.Question;
 import sk.jmurin.android.testy.entities.Test;
 import sk.jmurin.android.testy.entities.TestStats;
 
@@ -29,10 +34,8 @@ import sk.jmurin.android.testy.entities.TestStats;
 public class TestParametersDialogFragment extends DialogFragment {
 
     public static final String TAG = TestParametersDialogFragment.class.getSimpleName();
-    private RadioButton vsetkyRadioButton;
-    private RadioButton vybraneRadioButton;
-    private EditText minEditText;
-    private EditText maxEditText;
+    private RadioButton vsetkyRozsahRadioButton;
+    private RadioButton vybraneRozsahRadioButton;
     private CheckBox cervenaCheckbox;
     private CheckBox bielaCheckBox;
     private CheckBox zltaCheckBox;
@@ -46,6 +49,13 @@ public class TestParametersDialogFragment extends DialogFragment {
     private static final String ARG_PARAM2 = "param2";
     private Test test;
     private TestStats testStats;
+    private Spinner maxSpinner;
+    private Spinner minSpinner;
+    private RadioButton vsetkySkoreRadioButton;
+    private RadioButton vybraneSkoreRadioButton;
+    private LinearLayout checkboxyLayout;
+    private TextView sumarTextView;
+    private List<Question> vybrane;
 
     public TestParametersDialogFragment() {
         // Required empty public constructor
@@ -82,24 +92,80 @@ public class TestParametersDialogFragment extends DialogFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        TextView infoTextView = (TextView) view.findViewById(R.id.infoTextView);
-        infoTextView.setText(test.name + " " + test.version + "\notazok: " + test.questions.size() + "\n" + testStats.stats);
-//        vsetkyRadioButton = (RadioButton) view.findViewById(R.id.vsetkyRadioButton);
-//        vybraneRadioButton = (RadioButton) view.findViewById(R.id.vybraneRadioButton);
-//        rozsahLayout = (LinearLayout) view.findViewById(R.id.rozsahLayout);
-//        minEditText = (EditText) view.findViewById(R.id.minEditText);
-//        maxEditText = (EditText) view.findViewById(R.id.maxEditText);
-//        cervenaCheckbox = (CheckBox) view.findViewById(R.id.cervenaCheckBox);
-//        bielaCheckBox = (CheckBox) view.findViewById(R.id.bielaCheckBox);
-//        zltaCheckBox = (CheckBox) view.findViewById(R.id.zltaCheckBox);
-//        oranzovaCheckBox = (CheckBox) view.findViewById(R.id.oranzovaCheckBox);
-//        zelenaCheckBox = (CheckBox) view.findViewById(R.id.zelenaCheckBox);
+
+        View.OnClickListener filterParamListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                odfiltrujOtazky();
+            }
+        };
+        sumarTextView = (TextView) view.findViewById(R.id.sumarTextView);
+
+        // FILTER PODLA ROZSAHU
+        vsetkyRozsahRadioButton = (RadioButton) view.findViewById(R.id.vsetkyRadioButton);
+        vybraneRozsahRadioButton = (RadioButton) view.findViewById(R.id.vybraneRadioButton);
+        rozsahLayout = (LinearLayout) view.findViewById(R.id.rozsahLayout);
+        minSpinner = (Spinner) view.findViewById(R.id.minSpinner);
+        maxSpinner = (Spinner) view.findViewById(R.id.maxSpinner);
+        initSpinnerAdapters(1, test.questions.size());
+
+        // FILTER PODLA SKORE OTAZKY
+        vsetkySkoreRadioButton = (RadioButton) view.findViewById(R.id.vsetkySkoreRadioButton);
+        vybraneSkoreRadioButton = (RadioButton) view.findViewById(R.id.vybraneSkoreRadioButton);
+        checkboxyLayout = (LinearLayout) view.findViewById(R.id.checkboxyLayout);
+        cervenaCheckbox = (CheckBox) view.findViewById(R.id.cervenaCheckBox);
+        cervenaCheckbox.setOnClickListener(filterParamListener);
+        bielaCheckBox = (CheckBox) view.findViewById(R.id.bielaCheckBox);
+        bielaCheckBox.setOnClickListener(filterParamListener);
+        zltaCheckBox = (CheckBox) view.findViewById(R.id.zltaCheckBox);
+        zltaCheckBox.setOnClickListener(filterParamListener);
+        oranzovaCheckBox = (CheckBox) view.findViewById(R.id.oranzovaCheckBox);
+        oranzovaCheckBox.setOnClickListener(filterParamListener);
+        zelenaCheckBox = (CheckBox) view.findViewById(R.id.zelenaCheckBox);
+        zelenaCheckBox.setOnClickListener(filterParamListener);
+
+        vsetkyRozsahRadioButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // schovat rozsah layout
+                rozsahLayout.setVisibility(View.GONE);
+                odfiltrujOtazky();
+            }
+        });
+        vybraneRozsahRadioButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rozsahLayout.setVisibility(View.VISIBLE);
+                odfiltrujOtazky();
+            }
+        });
+        vsetkySkoreRadioButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // schovat rozsah layout
+                checkboxyLayout.setVisibility(View.GONE);
+                odfiltrujOtazky();
+            }
+        });
+        vybraneSkoreRadioButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                checkboxyLayout.setVisibility(View.VISIBLE);
+                odfiltrujOtazky();
+            }
+        });
+
         zacniTestButton = (Button) view.findViewById(R.id.zacniTestButton);
         zacniTestButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dismiss();
-                InstanciaTestu it = new InstanciaTestu(test, test.questions, testStats);
+
+                if (vybrane == null) {
+                    odfiltrujOtazky();
+                }
+
+                InstanciaTestu it = new InstanciaTestu(test, vybrane, testStats);
                 it.setUcenieSelected(false);
 
                 Intent intent = new Intent(getActivity(), QuestionActivity.class);
@@ -114,20 +180,115 @@ public class TestParametersDialogFragment extends DialogFragment {
                 dismiss();
             }
         });
-//
-//        vsetkyRadioButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                // schovat rozsah layout
-//                rozsahLayout.setVisibility(View.GONE);
-//            }
-//        });
-//        vybraneRadioButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                rozsahLayout.setVisibility(View.VISIBLE);
-//            }
-//        });
+    }
+
+    private void odfiltrujOtazky() {
+        HashMap<Integer, Integer> mapa = new HashMap<>();
+        mapa.put(-1, 0);
+        mapa.put(0, 0);
+        mapa.put(1, 0);
+        mapa.put(2, 0);
+        mapa.put(3, 0);
+
+        int min;
+        int max;
+        if (vsetkyRozsahRadioButton.isChecked()) {
+            min = 1;
+            max = test.questions.size();
+        } else {
+            min = (int) minSpinner.getSelectedItem();
+            max = (int) maxSpinner.getSelectedItem();
+            if (min > max) {
+                minSpinner.setSelection(max - 1); // najmensia hodnota v spinneri je 1 a najvyssia pocet otazok v teste
+                maxSpinner.setSelection(min - 1); // nastavuje sa index v array adapteri, nie hodnota
+                int pom = min;
+                min = max;
+                max = pom;
+            }
+        }
+        System.out.println("vybrane hodnoty min: " + min + " max: " + max);
+        vybrane = new ArrayList<>();
+        for (int i = min - 1; i < max; i++) { // 1..10 == 0..9 v liste
+            int stat = testStats.stats.get(i).stat; // otazky v teste su v rovnakom poradi ako v teststats
+            if (vyhovujeCheckboxomOtazka(stat)) {
+                vybrane.add(test.questions.get(i));
+                mapa.put(stat, mapa.get(stat) + 1);
+            }
+        }
+
+        cervenaCheckbox.setText("+" + mapa.get(-1));
+        bielaCheckBox.setText("+" + mapa.get(0));
+        zltaCheckBox.setText("+" + mapa.get(1));
+        oranzovaCheckBox.setText("+" + mapa.get(2));
+        zelenaCheckBox.setText("+" + mapa.get(3));
+        System.out.println("vybranych otazok celkom: " + vybrane.size());
+        sumarTextView.setText("Vybraných otázok celkom: " + vybrane.size());
+    }
+
+    private boolean vyhovujeCheckboxomOtazka(int stat) {
+        if (vsetkySkoreRadioButton.isChecked()) {
+            // berieme vsetky farby
+            return true;
+        }
+        if (stat == 0 && bielaCheckBox.isChecked()) {
+            return true;
+        }
+        if (stat == 1 && zltaCheckBox.isChecked()) {
+            return true;
+        }
+        if (stat == 2 && oranzovaCheckBox.isChecked()) {
+            return true;
+        }
+        if (stat < 0 && cervenaCheckbox.isChecked()) {
+            return true;
+        }
+        if (stat > 2 && zelenaCheckBox.isChecked()) {
+            return true;
+        }
+
+        return false;
+    }
+
+
+    private void initSpinnerAdapters(int min, int max) {
+        List<Integer> spinnerVals = new ArrayList<>();
+        for (int i = min; i <= max; i++) {
+            spinnerVals.add(i);
+        }
+        ArrayAdapter<Integer> minSpinnerAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, spinnerVals);
+        minSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        minSpinner.setAdapter(minSpinnerAdapter);
+        System.out.println("adapter set: " + spinnerVals);
+        minSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                System.out.println("vybrana min hodnota: [" + minSpinner.getSelectedItem() + "]");
+                odfiltrujOtazky();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                System.out.println("Spinner: nothing selected");
+            }
+        });
+        minSpinner.setSelection(0);
+
+        ArrayAdapter<Integer> maxSpinnerAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, spinnerVals);
+        maxSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        maxSpinner.setAdapter(maxSpinnerAdapter);
+        maxSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                System.out.println("vybrana max hodnota: [" + maxSpinner.getSelectedItem() + "]");
+                odfiltrujOtazky();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                System.out.println("Spinner: nothing selected");
+            }
+        });
+        maxSpinner.setSelection(spinnerVals.size() - 1);
     }
 
     /**
@@ -140,7 +301,8 @@ public class TestParametersDialogFragment extends DialogFragment {
         // title by default, but your custom layout might not need it. So here you can
         // remove the dialog title, but you must call the superclass to get the Dialog.
         Dialog dialog = super.onCreateDialog(savedInstanceState);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setTitle("Výber otázok");
+        //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         return dialog;
     }
 }

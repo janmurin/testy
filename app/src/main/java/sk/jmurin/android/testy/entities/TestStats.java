@@ -11,6 +11,14 @@ public class TestStats implements Serializable{
     public final int test_version;
     public final ArrayList<QuestionStat> stats = new ArrayList<>();
 
+    /**
+     * prida do arraylistu na danu poziciu questionstat
+     * pozizia suhlasi s idckom otazky v teste
+     * @param test_id
+     * @param stat
+     * @param db_id
+     * @return
+     */
     public boolean addQuestionStat(int test_id, int stat, int db_id) {
         if (test_id >= stats.size()) {
             stats.ensureCapacity(test_id + 1);// pozor nato lebo idcko v liste a velkost listu je velky rozdiel

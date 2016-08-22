@@ -22,6 +22,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import junit.framework.Assert;
+
 import java.text.DecimalFormat;
 import java.util.List;
 
@@ -221,8 +223,8 @@ public class QuestionActivity extends AppCompatActivity {
         System.out.println();
 
 //        // updatneme statistiku
-        int novyStat = instanciaTestu.idckaUloh[instanciaTestu.aktUlohaIdx][2];
-        int db_id = instanciaTestu.idckaUloh[instanciaTestu.aktUlohaIdx][3];
+        final int novyStat = instanciaTestu.idckaUloh[instanciaTestu.aktUlohaIdx][2];
+        final int db_id = instanciaTestu.idckaUloh[instanciaTestu.aktUlohaIdx][3];
         // update testStatu vytiahnuteho z databazy TODO: bude mat homefragment referenciu na tuto zmenu?
         instanciaTestu.testStats.stats.get(instanciaTestu.idckaUloh[instanciaTestu.aktUlohaIdx][0]).stat = novyStat;
         // update hodnoty v databaze
@@ -247,15 +249,20 @@ public class QuestionActivity extends AppCompatActivity {
                 Log.d(TAG, "onQueryComplete token=" + token);
                 if (cursor.moveToNext()) {
                     int stat = cursor.getInt(cursor.getColumnIndex(DataContract.QuestionStats.STAT));
-                    int db_id = cursor.getInt(cursor.getColumnIndex(DataContract.QuestionStats._ID));
+                    int db_id2 = cursor.getInt(cursor.getColumnIndex(DataContract.QuestionStats._ID));
                     int question_test_id = cursor.getInt(cursor.getColumnIndex(DataContract.QuestionStats.QUESTION_TEST_ID));
                     String test_name = cursor.getString(cursor.getColumnIndex(DataContract.QuestionStats.TEST_NAME));
                     int test_version = cursor.getInt(cursor.getColumnIndex(DataContract.QuestionStats.TEST_VERSION));
                     System.out.println("stat=" + stat);
-                    System.out.println("db_id=" + db_id);
+                    System.out.println("db_id=" + db_id2);
                     System.out.println("question_test_id=" + question_test_id);
                     System.out.println("test_name=" + test_name);
                     System.out.println("test_version=" + test_version);
+                    // check ze vlozilo to do DB tam kde to malo to co malo
+                    Assert.assertTrue(novyStat == stat && db_id2 == db_id);
+                } else {
+                    // musi vzdy najst to co updatlo predtym
+                    Assert.fail("nenaslo to co updatlo db_id=" + db_id + " a novy_stat=" + novyStat);
                 }
                 cursor.close();
             }

@@ -196,18 +196,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.home) {
-            showContentFragment(new HomeFragment(), HomeFragment.TAG);
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        switch(id){
+            case R.id.nav_gallery:break;
+            case R.id.nav_slideshow:break;
+            case R.id.nav_share:break;
+            default: Log.d(TAG,"onNavigationItemSelected default case");
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

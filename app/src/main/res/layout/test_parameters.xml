@@ -2,197 +2,285 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="300dp"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:scrollbars="vertical">
 
     <TextView
+        android:id="@+id/rozsahTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/infoTextView"/>
+        android:gravity="left"
+        android:text="Rozsah:"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <!--<TextView-->
-        <!--android:id="@+id/rozsahTextView"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:gravity="center"-->
-        <!--android:text="Rozsah otazok:"-->
-        <!--android:textAppearance="?android:attr/textAppearanceSmall" />-->
+    <LinearLayout
+        android:id="@+id/radioButtonsLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center"
+        android:orientation="horizontal">
 
-    <!--&lt;!&ndash; nastavenia &ndash;&gt;-->
-    <!--<LinearLayout-->
-        <!--android:id="@+id/radioButtonsLayout"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:orientation="horizontal">-->
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
 
-        <!--<RadioGroup-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:gravity="center"-->
-            <!--android:orientation="horizontal">-->
+            <RadioButton
+                android:id="@+id/vsetkyRadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_weight="1"
+                android:checked="true"
+                android:clickable="true"
+                android:enabled="true"
+                android:gravity="center"
+                android:text="všetky" />
 
-            <!--<RadioButton-->
-                <!--android:id="@+id/vsetkyRadioButton"-->
-                <!--android:layout_width="0dp"-->
-                <!--android:layout_height="30dp"-->
-                <!--android:layout_weight="1"-->
-                <!--android:checked="true"-->
-                <!--android:clickable="true"-->
-                <!--android:enabled="true"-->
-                <!--android:gravity="center"-->
-                <!--android:text="vsetky" />-->
+            <RadioButton
+                android:id="@+id/vybraneRadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:enabled="true"
+                android:gravity="center"
+                android:text="interval" />
+        </RadioGroup>
+    </LinearLayout>
 
-            <!--<RadioButton-->
-                <!--android:id="@+id/vybraneRadioButton"-->
-                <!--android:layout_width="0dp"-->
-                <!--android:layout_height="30dp"-->
-                <!--android:layout_weight="1"-->
-                <!--android:clickable="true"-->
-                <!--android:enabled="true"-->
-                <!--android:gravity="center"-->
-                <!--android:text="vybrane" />-->
-        <!--</RadioGroup>-->
-    <!--</LinearLayout>-->
+    <LinearLayout
+        android:id="@+id/rozsahLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:background="#EEEEEE"
+        android:orientation="horizontal"
+        android:visibility="gone">
 
-    <!--<LinearLayout-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:orientation="horizontal"-->
-        <!--android:id="@+id/rozsahLayout"-->
-        <!--android:visibility="gone">-->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="od: " />
 
-        <!--<EditText-->
-            <!--android:id="@+id/minEditText"-->
-            <!--android:layout_width="0dp"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_weight="1"-->
-            <!--android:ems="10"-->
-            <!--android:inputType="number"-->
-            <!--android:text="1" />-->
+        <Spinner
+            android:id="@+id/minSpinner"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp" />
 
-        <!--<EditText-->
-            <!--android:id="@+id/maxEditText"-->
-            <!--android:layout_width="0dp"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_weight="1"-->
-            <!--android:ems="10"-->
-            <!--android:inputType="number"-->
-            <!--android:text="10" />-->
-    <!--</LinearLayout>-->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="do: " />
 
-    <!--&lt;!&ndash; checkboxy a button &ndash;&gt;-->
-    <!--<LinearLayout-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:orientation="vertical">-->
+        <Spinner
+            android:id="@+id/maxSpinner"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp" />
+    </LinearLayout>
 
-        <!--<TextView-->
-            <!--android:id="@+id/filtreTextView"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:gravity="left"-->
-            <!--android:text="Farby otázok:"-->
-            <!--android:textColor="@android:color/black" />-->
+    <TextView
+        android:id="@+id/filtreTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        android:text="Skóre:"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@android:color/black" />
+
+    <LinearLayout
+        android:id="@+id/radioButtonsLayout2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/vsetkySkoreRadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_weight="1"
+                android:checked="true"
+                android:clickable="true"
+                android:enabled="true"
+                android:gravity="center"
+                android:text="všetky" />
+
+            <RadioButton
+                android:id="@+id/vybraneSkoreRadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:enabled="true"
+                android:gravity="center"
+                android:text="výber" />
+        </RadioGroup>
+    </LinearLayout>
 
 
-        <!--<LinearLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:orientation="horizontal">-->
-
-            <!--<CheckBox-->
-                <!--android:id="@+id/cervenaCheckBox"-->
-                <!--android:layout_width="0dp"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_weight="1"-->
-                <!--android:background="@android:color/holo_red_light"-->
-                <!--android:checked="true"-->
-                <!--android:gravity="center"-->
-                <!--android:text="" />-->
-
-            <!--<CheckBox-->
-                <!--android:id="@+id/bielaCheckBox"-->
-                <!--android:layout_width="0dp"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_weight="1"-->
-                <!--android:background="@android:color/white"-->
-                <!--android:checked="true"-->
-                <!--android:gravity="center"-->
-                <!--android:text="" />-->
-        <!--</LinearLayout>-->
-
-        <!--<LinearLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:orientation="horizontal">-->
-
-            <!--<CheckBox-->
-                <!--android:id="@+id/zltaCheckBox"-->
-                <!--android:layout_width="0dp"-->
-                <!--android:layout_height="match_parent"-->
-                <!--android:layout_weight="1"-->
-                <!--android:background="#FFD700"-->
-                <!--android:checked="true"-->
-                <!--android:gravity="center"-->
-                <!--android:text="" />-->
-
-            <!--<CheckBox-->
-                <!--android:id="@+id/oranzovaCheckBox"-->
-                <!--android:layout_width="0dp"-->
-                <!--android:layout_height="match_parent"-->
-                <!--android:layout_weight="1"-->
-                <!--android:background="@android:color/holo_orange_light"-->
-                <!--android:checked="true"-->
-                <!--android:gravity="center"-->
-                <!--android:text="" />-->
-        <!--</LinearLayout>-->
-
-        <!--<LinearLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:orientation="horizontal">-->
-
-            <!--<CheckBox-->
-                <!--android:id="@+id/zelenaCheckBox"-->
-                <!--android:layout_width="0dp"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_weight="1"-->
-                <!--android:background="@android:color/holo_green_light"-->
-                <!--android:gravity="center"-->
-                <!--android:text="" />-->
-
-            <!--<TextView-->
-                <!--android:id="@+id/pomocnaTextView"-->
-                <!--android:layout_width="0dp"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_weight="1"-->
-                <!--android:gravity="center" />-->
-
-        <!--</LinearLayout>-->
+    <LinearLayout
+        android:id="@+id/checkboxyLayout"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="center_horizontal"
+        android:background="#EEEEEE"
+        android:visibility="gone">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/zrusitTestButton"
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
                 android:layout_gravity="left"
-                android:enabled="true"
-                android:text="zrusit" />
+                android:text="červené" />
 
-            <Button
-                android:id="@+id/zacniTestButton"
-                android:layout_width="wrap_content"
+            <CheckBox
+                android:id="@+id/cervenaCheckBox"
+                android:layout_width="80dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:layout_gravity="right"
-                android:enabled="true"
-                android:text="začni test" />
+                android:checked="true"
+                android:gravity="center"
+                android:text="" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:text="biele" />
+
+            <CheckBox
+                android:id="@+id/bielaCheckBox"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:checked="true"
+                android:gravity="center"
+                android:text="" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:text="žlté" />
+
+            <CheckBox
+                android:id="@+id/zltaCheckBox"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:checked="true"
+                android:gravity="center"
+                android:text="" />
+
         </RelativeLayout>
 
 
-    <!--</LinearLayout>-->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:text="oranžové" />
+
+            <CheckBox
+                android:id="@+id/oranzovaCheckBox"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:gravity="center"
+                android:text="" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:text="zelené" />
+
+            <CheckBox
+                android:id="@+id/zelenaCheckBox"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:checked="true"
+                android:gravity="center"
+                android:text="" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/sumarTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        android:text="Vybraných otázok celkom: 12"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/zrusitTestButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_gravity="left"
+            android:enabled="true"
+            android:text="zrusit" />
+
+        <Button
+            android:id="@+id/zacniTestButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="right"
+            android:enabled="true"
+            android:text="začni test" />
+    </RelativeLayout>
+
 </LinearLayout>
