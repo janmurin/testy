@@ -1,19 +1,8 @@
 package sk.jmurin.android.testy;
 
-import android.app.AlertDialog;
-import android.app.LoaderManager;
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.CursorLoader;
-import android.content.Loader;
-import android.database.Cursor;
-import android.graphics.Color;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -22,36 +11,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
-
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Headers;
-import okhttp3.Request;
-import okhttp3.Response;
-import sk.jmurin.android.testy.content.DataContract;
-import sk.jmurin.android.testy.content.MyContentProvider;
-import sk.jmurin.android.testy.entities.Test;
-import sk.jmurin.android.testy.entities.TestInformation;
-import sk.jmurin.android.testy.entities.TestStats;
 import sk.jmurin.android.testy.fragments.HomeFragment;
-import sk.jmurin.android.testy.utils.DownloadEvents;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -197,9 +158,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
 
         switch(id){
-            case R.id.nav_gallery:break;
-            case R.id.nav_slideshow:break;
-            case R.id.nav_share:break;
+            case R.id.home:break;
+            case R.id.hall_of_fame:break;
+            case R.id.tutorial:break;
+            case R.id.settings:break;
             default: Log.d(TAG,"onNavigationItemSelected default case");
         }
 

@@ -223,6 +223,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:gravity="center"
+                android:checked="true"
                 android:text="" />
 
         </RelativeLayout>
@@ -243,7 +244,6 @@
                 android:layout_width="80dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:checked="true"
                 android:gravity="center"
                 android:text="" />
 
@@ -271,7 +271,7 @@
             android:layout_alignParentLeft="true"
             android:layout_gravity="left"
             android:enabled="true"
-            android:text="zrusit" />
+            android:text="Zrušiť" />
 
         <Button
             android:id="@+id/zacniTestButton"
@@ -280,7 +280,7 @@
             android:layout_alignParentRight="true"
             android:layout_gravity="right"
             android:enabled="true"
-            android:text="začni test" />
+            android:text="Začať test" />
     </RelativeLayout>
 
 </LinearLayout>

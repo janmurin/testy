@@ -9,7 +9,7 @@ public class Statistika implements Serializable {
 
     public int vyriesenych;
     public int uspesnych;
-    public double uspesnost;
+    public int uspesnost;
     public int minusBodov;
     public int[] pribudlo=new int[5];
     public int[] zleZodpovedane;

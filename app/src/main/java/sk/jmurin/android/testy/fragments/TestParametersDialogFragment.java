@@ -45,8 +45,8 @@ public class TestParametersDialogFragment extends DialogFragment {
     private Button zrusitTestButton;
     private LinearLayout rozsahLayout;
 
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String TEST_PARAM = "param1";
+    private static final String TEST_STATS_PARAM = "param2";
     private Test test;
     private TestStats testStats;
     private Spinner maxSpinner;
@@ -64,8 +64,8 @@ public class TestParametersDialogFragment extends DialogFragment {
     public static TestParametersDialogFragment newInstance(Test test, TestStats testsStats) {
         TestParametersDialogFragment fragment = new TestParametersDialogFragment();
         Bundle args = new Bundle();
-        args.putSerializable(ARG_PARAM1, test);
-        args.putSerializable(ARG_PARAM2, testsStats);
+        args.putSerializable(TEST_PARAM, test);
+        args.putSerializable(TEST_STATS_PARAM, testsStats);
         fragment.setArguments(args);
         return fragment;
     }
@@ -74,8 +74,8 @@ public class TestParametersDialogFragment extends DialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            test = (Test) getArguments().getSerializable(ARG_PARAM1);
-            testStats = (TestStats) getArguments().getSerializable(ARG_PARAM2);
+            test = (Test) getArguments().getSerializable(TEST_PARAM);
+            testStats = (TestStats) getArguments().getSerializable(TEST_STATS_PARAM);
         }
         setCancelable(true);
     }
@@ -86,7 +86,7 @@ public class TestParametersDialogFragment extends DialogFragment {
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.test_parameters, container, false);
+        return inflater.inflate(R.layout.fragment_parameters_dialog, container, false);
     }
 
     @Override
@@ -103,7 +103,22 @@ public class TestParametersDialogFragment extends DialogFragment {
 
         // FILTER PODLA ROZSAHU
         vsetkyRozsahRadioButton = (RadioButton) view.findViewById(R.id.vsetkyRadioButton);
+        vsetkyRozsahRadioButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // schovat rozsah layout
+                rozsahLayout.setVisibility(View.GONE);
+                odfiltrujOtazky();
+            }
+        });
         vybraneRozsahRadioButton = (RadioButton) view.findViewById(R.id.vybraneRadioButton);
+        vybraneRozsahRadioButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rozsahLayout.setVisibility(View.VISIBLE);
+                odfiltrujOtazky();
+            }
+        });
         rozsahLayout = (LinearLayout) view.findViewById(R.id.rozsahLayout);
         minSpinner = (Spinner) view.findViewById(R.id.minSpinner);
         maxSpinner = (Spinner) view.findViewById(R.id.maxSpinner);
@@ -124,21 +139,6 @@ public class TestParametersDialogFragment extends DialogFragment {
         zelenaCheckBox = (CheckBox) view.findViewById(R.id.zelenaCheckBox);
         zelenaCheckBox.setOnClickListener(filterParamListener);
 
-        vsetkyRozsahRadioButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // schovat rozsah layout
-                rozsahLayout.setVisibility(View.GONE);
-                odfiltrujOtazky();
-            }
-        });
-        vybraneRozsahRadioButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                rozsahLayout.setVisibility(View.VISIBLE);
-                odfiltrujOtazky();
-            }
-        });
         vsetkySkoreRadioButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -166,7 +166,6 @@ public class TestParametersDialogFragment extends DialogFragment {
                 }
 
                 InstanciaTestu it = new InstanciaTestu(test, vybrane, testStats);
-                it.setUcenieSelected(false);
 
                 Intent intent = new Intent(getActivity(), QuestionActivity.class);
                 intent.putExtra(QuestionActivity.TEST_INSTANCIA_BUNDLE_KEY, it);
@@ -212,8 +211,8 @@ public class TestParametersDialogFragment extends DialogFragment {
             int stat = testStats.stats.get(i).stat; // otazky v teste su v rovnakom poradi ako v teststats
             if (vyhovujeCheckboxomOtazka(stat)) {
                 vybrane.add(test.questions.get(i));
-                mapa.put(stat, mapa.get(stat) + 1);
             }
+            mapa.put(stat, mapa.get(stat) + 1);
         }
 
         cervenaCheckbox.setText("+" + mapa.get(-1));

@@ -31,14 +31,14 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="pred" />
+            android:text="&lt;&lt;" />
 
         <Button
             android:id="@+id/dalejButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="dalej" />
+            android:text="&gt;&gt;" />
     </LinearLayout>
 
 </RelativeLayout>

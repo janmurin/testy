@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -339,33 +338,21 @@ public class HomeFragment extends Fragment {
         private final MainActivity context;
         private final List<Test> tests;
         private final String[][] vals;
-        private final Map<String, TestStats> testStats;
+        private final Map<String, TestStats> testStatsMap;
         private int mBackground;
 
-        public SimpleStringRecyclerViewAdapter(Context context, List<Test> jsonTests, Map<String, TestStats> testStats) {
+        public SimpleStringRecyclerViewAdapter(Context context, List<Test> jsonTests, Map<String, TestStats> testStatsMap) {
             context.getTheme().resolveAttribute(R.attr.selectableItemBackground, mTypedValue, true);
             this.context = (MainActivity) context;
             mBackground = mTypedValue.resourceId;
             this.tests = jsonTests;
-            this.testStats = testStats;
+            this.testStatsMap = testStatsMap;
             vals = new String[jsonTests.size()][2];
             for (int i = 0; i < jsonTests.size(); i++) {
                 Test t = jsonTests.get(i);
-                TestStats ts = testStats.get(t.name + "_" + t.version);
-                int percento = 0;
-                if (ts != null) {
-                    for (int j = 0; j < ts.stats.size(); j++) {
-                        int stat = ts.stats.get(j).stat;
-                        if (stat >= 0) {
-                            percento += stat;
-                        }
-                    }
-                    percento = (int) (percento / (double) (ts.stats.size() * 3) * 100);
-                } else {
-                    throw new RuntimeException("nenaslo test stat");
-                }
+                TestStats ts = testStatsMap.get(t.name + "_" + t.version);
                 vals[i][0] = t.name;
-                vals[i][1] = percento + "%";
+                vals[i][1] = ts.getSkorePercento() + "%";
             }
         }
 
@@ -424,7 +411,7 @@ public class HomeFragment extends Fragment {
                     //TODO: pouzit embedded dialog na velke layouty
                     FragmentManager fragmentManager = context.getSupportFragmentManager();
                     Test test = tests.get(position);
-                    TestParametersDialogFragment newFragment = TestParametersDialogFragment.newInstance(test, testStats.get(test.name + "_" + test.version));
+                    TestParametersDialogFragment newFragment = TestParametersDialogFragment.newInstance(test, testStatsMap.get(test.name + "_" + test.version));
                     newFragment.show(fragmentManager, TestParametersDialogFragment.TAG);
 
                 }

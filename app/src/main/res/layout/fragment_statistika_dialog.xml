@@ -4,10 +4,71 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <!--<TextView-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:id="@+id/infoTextView"/>-->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Base.TextAppearance.AppCompat.Medium"
+            android:text="Celková úspešnosť testu: " />
+
+        <TextView
+            android:id="@+id/uspesnostTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Base.TextAppearance.AppCompat.Medium"
+            android:text="80%" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Base.TextAppearance.AppCompat.Medium"
+            android:text="Správnych odpovedí: " />
+
+        <TextView
+            android:id="@+id/spravnychTextView"
+            android:layout_width="wrap_content"
+            style="@style/Base.TextAppearance.AppCompat.Medium"
+            android:layout_height="wrap_content"
+            android:text="6 z 8" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Base.TextAppearance.AppCompat.Medium"
+            android:text="Celkové aktuálne skóre: " />
+
+        <TextView
+            android:id="@+id/skoreTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Base.TextAppearance.AppCompat.Medium"
+            android:text="80%" />
+    </LinearLayout>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/infoTextView"/>
+        android:id="@+id/hintTextView"
+        style="@style/TextAppearance.AppCompat.Small"
+        android:text="Zopakujte si zle zodpovedané otázky alebo ukončite tento test."/>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -21,7 +82,7 @@
             android:layout_alignParentLeft="true"
             android:layout_gravity="left"
             android:enabled="true"
-            android:text="zavriet" />
+            android:text="Zavrieť" />
 
         <Button
             android:id="@+id/zacniTestButton"
@@ -30,7 +91,7 @@
             android:layout_alignParentRight="true"
             android:layout_gravity="right"
             android:enabled="true"
-            android:text="znova prejst" />
+            android:text="Zopakovať" />
     </RelativeLayout>
 
 </LinearLayout>

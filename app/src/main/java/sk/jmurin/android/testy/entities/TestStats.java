@@ -6,14 +6,15 @@ import java.util.ArrayList;
 /**
  * Created by jan.murin on 17-Aug-16.
  */
-public class TestStats implements Serializable{
+public class TestStats implements Serializable {
     public final String test_name;
     public final int test_version;
     public final ArrayList<QuestionStat> stats = new ArrayList<>();
 
     /**
      * prida do arraylistu na danu poziciu questionstat
-     * pozizia suhlasi s idckom otazky v teste
+     * poz
+     *
      * @param test_id
      * @param stat
      * @param db_id
@@ -53,5 +54,17 @@ public class TestStats implements Serializable{
         int result = test_name.hashCode();
         result = 31 * result + test_version;
         return result;
+    }
+
+    public int getSkorePercento() {
+        int percento = 0;
+        for (int j = 0; j < stats.size(); j++) {
+            int stat = stats.get(j).stat;
+            if (stat >= 0) {
+                percento += stat;
+            }
+        }
+        percento = (int) (percento / (double) (stats.size() * 3) * 100);
+        return percento;
     }
 }

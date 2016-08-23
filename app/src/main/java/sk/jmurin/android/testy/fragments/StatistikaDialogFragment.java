@@ -34,6 +34,10 @@ public class StatistikaDialogFragment extends DialogFragment {
 
     private static final String ARG_PARAM1 = "param1";
     private InstanciaTestu instanciaTestu;
+    private TextView uspesnostTextView;
+    private TextView spravnychTextView;
+    private TextView skoreTextView;
+    private TextView hintTextView;
 
     public StatistikaDialogFragment() {
         // Required empty public constructor
@@ -59,7 +63,7 @@ public class StatistikaDialogFragment extends DialogFragment {
     private Statistika getStatistika(InstanciaTestu instanciaTestu) {
         Statistika st = new Statistika();
         st.minusBodov = instanciaTestu.pocetMinusBodov;
-        st.uspesnost = instanciaTestu.uspesnych / (double) instanciaTestu.getOhodnotenych() * 100;
+        st.uspesnost = (int) (instanciaTestu.uspesnych / (double) instanciaTestu.getOhodnotenych() * 100);
         st.uspesnych = instanciaTestu.uspesnych;
         st.vyriesenych = instanciaTestu.getOhodnotenych();
         st.zleZodpovedane = instanciaTestu.getZleZodpovedane();
@@ -81,22 +85,35 @@ public class StatistikaDialogFragment extends DialogFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         final Statistika statistika = getStatistika(instanciaTestu);
-        TextView infoTextView = (TextView) view.findViewById(R.id.infoTextView);
-        DecimalFormat df=new DecimalFormat("##.##");
-        String textik = "Vyriešených otázok: " + statistika.vyriesenych + "\n" +
-                "Úspešných: otázok: " + statistika.uspesnych + "\n" +
-                "Úspešnosť: " + df.format(statistika.uspesnost) + " %\n" +
-                "Mínus bodov: " + statistika.minusBodov + "\n" +
-                "cervenych: " + String.format("%+d", statistika.pribudlo[0]) + "\n" +
-                "bielych: " + String.format("%+d", statistika.pribudlo[1]) + "\n" +
-                "zltych: " + String.format("%+d", statistika.pribudlo[2]) + "\n" +
-                "oranzovych: " + String.format("%+d", statistika.pribudlo[3]) + "\n" +
-                "zelenych: " + String.format("%+d", statistika.pribudlo[4]);
-        infoTextView.setText(textik);
+//        TextView infoTextView = (TextView) view.findViewById(R.id.infoTextView);
+        DecimalFormat df = new DecimalFormat("##.##");
+//        String textik = "Vyriešených otázok: " + statistika.vyriesenych + "\n" +
+//                "Úspešných: otázok: " + statistika.uspesnych + "\n" +
+//                "Úspešnosť: " + df.format(statistika.uspesnost) + " %\n" +
+//                "Mínus bodov: " + statistika.minusBodov + "\n" +
+//                "cervenych: " + String.format("%+d", statistika.pribudlo[0]) + "\n" +
+//                "bielych: " + String.format("%+d", statistika.pribudlo[1]) + "\n" +
+//                "zltych: " + String.format("%+d", statistika.pribudlo[2]) + "\n" +
+//                "oranzovych: " + String.format("%+d", statistika.pribudlo[3]) + "\n" +
+//                "zelenych: " + String.format("%+d", statistika.pribudlo[4]);
+//        infoTextView.setText(textik);
+
+        uspesnostTextView = (TextView) view.findViewById(R.id.uspesnostTextView);
+        spravnychTextView = (TextView) view.findViewById(R.id.spravnychTextView);
+        skoreTextView = (TextView) view.findViewById(R.id.skoreTextView);
+        hintTextView = (TextView) view.findViewById(R.id.hintTextView);
+
+        uspesnostTextView.setText(df.format(statistika.uspesnost) + " %");
+        spravnychTextView.setText(statistika.uspesnych + " z " + statistika.vyriesenych);
+        skoreTextView.setText(instanciaTestu.testStats.getSkorePercento() + " %");
+        if (statistika.uspesnych == statistika.vyriesenych) {
+            hintTextView.setVisibility(View.GONE);
+        }
+
         zacniTestButton = (Button) view.findViewById(R.id.zacniTestButton);
-        if(statistika.zleZodpovedane.length>0) {
-            zacniTestButton.setText("znova prejst (" + statistika.zleZodpovedane.length + ")");
-        }else{
+        if (statistika.zleZodpovedane.length > 0) {
+            zacniTestButton.setText("Zopakovať (" + statistika.zleZodpovedane.length + ") otázok");
+        } else {
             zacniTestButton.setVisibility(View.GONE);
         }
         zacniTestButton.setOnClickListener(new View.OnClickListener() {
@@ -135,7 +152,7 @@ public class StatistikaDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Dialog dialog = super.onCreateDialog(savedInstanceState);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setTitle("Vyhodnotenie");
         return dialog;
     }
 }

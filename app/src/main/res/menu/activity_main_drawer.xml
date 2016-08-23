@@ -7,30 +7,30 @@
             android:icon="@drawable/ic_menu_camera"
             android:title="Testy" />
         <item
-            android:id="@+id/nav_gallery"
+            android:id="@+id/hall_of_fame"
             android:icon="@drawable/ic_menu_gallery"
             android:title="Sieň slávy" />
         <item
-            android:id="@+id/nav_manage"
+            android:id="@+id/tutorial"
             android:icon="@drawable/ic_menu_manage"
             android:title="Tutoriál" />
         <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:id="@+id/settings"
+            android:icon="@drawable/ic_menu_manage"
             android:title="Nastavenia" />
     </group>
 
-    <item android:title="Communicate">
-        <menu>
-            <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Zdielať" />
+    <!--<item android:title="Communicate">-->
+        <!--<menu>-->
             <!--<item-->
-                <!--android:id="@+id/nav_send"-->
-                <!--android:icon="@drawable/ic_menu_send"-->
-                <!--android:title="Správy" />-->
-        </menu>
-    </item>
+                <!--android:id="@+id/nav_share"-->
+                <!--android:icon="@drawable/ic_menu_share"-->
+                <!--android:title="Zdielať" />-->
+            <!--&lt;!&ndash;<item&ndash;&gt;-->
+                <!--&lt;!&ndash;android:id="@+id/nav_send"&ndash;&gt;-->
+                <!--&lt;!&ndash;android:icon="@drawable/ic_menu_send"&ndash;&gt;-->
+                <!--&lt;!&ndash;android:title="Správy" />&ndash;&gt;-->
+        <!--</menu>-->
+    <!--</item>-->
 
 </menu>
