@@ -14,9 +14,12 @@ import sk.jmurin.android.testy.entities.TestStats;
 public class App extends Application {
 
     public static final String TAG = "Testy App";
+    public static final String DEFAULT_USERNAME = "default";
+    public static String USERNAME = DEFAULT_USERNAME;
+
 
     private static Context sInstance;
-    public static Map<String,TestStats> testStatsMap;
+    public static Map<String, TestStats> testStatsMap;
 
     @Override
     public void onCreate() {

@@ -85,18 +85,7 @@ public class StatistikaDialogFragment extends DialogFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         final Statistika statistika = getStatistika(instanciaTestu);
-//        TextView infoTextView = (TextView) view.findViewById(R.id.infoTextView);
         DecimalFormat df = new DecimalFormat("##.##");
-//        String textik = "Vyriešených otázok: " + statistika.vyriesenych + "\n" +
-//                "Úspešných: otázok: " + statistika.uspesnych + "\n" +
-//                "Úspešnosť: " + df.format(statistika.uspesnost) + " %\n" +
-//                "Mínus bodov: " + statistika.minusBodov + "\n" +
-//                "cervenych: " + String.format("%+d", statistika.pribudlo[0]) + "\n" +
-//                "bielych: " + String.format("%+d", statistika.pribudlo[1]) + "\n" +
-//                "zltych: " + String.format("%+d", statistika.pribudlo[2]) + "\n" +
-//                "oranzovych: " + String.format("%+d", statistika.pribudlo[3]) + "\n" +
-//                "zelenych: " + String.format("%+d", statistika.pribudlo[4]);
-//        infoTextView.setText(textik);
 
         uspesnostTextView = (TextView) view.findViewById(R.id.uspesnostTextView);
         spravnychTextView = (TextView) view.findViewById(R.id.spravnychTextView);

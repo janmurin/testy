@@ -7,7 +7,7 @@ import sk.jmurin.android.testy.entities.TestInformation;
 /**
  * Created by jan.murin on 16-Aug-16.
  */
-public final class DownloadEvents {
+public final class EventBusEvents {
     public static class NewTestsToDownload {
         public final List<TestInformation> nove;
 
@@ -20,6 +20,20 @@ public final class DownloadEvents {
     }
 
     public static class NewTestsDownloaded {
+    }
+
+    public static class DalejButtonClicked {
+    }
+
+    public static class UsernameSelected {
+        public final String meno;
+
+        public UsernameSelected(String meno) {
+            this.meno=meno;
+        }
+    }
+
+    public static class ZavrietTutorial {
     }
 
 //    public static class Progress {

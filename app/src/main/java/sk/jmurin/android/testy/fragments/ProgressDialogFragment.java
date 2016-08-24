@@ -2,7 +2,6 @@ package sk.jmurin.android.testy.fragments;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.AsyncQueryHandler;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,7 +10,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.util.Log;
-import android.widget.TextView;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -25,14 +23,13 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
+import sk.jmurin.android.testy.Secrets;
 import sk.jmurin.android.testy.content.DataContract;
 import sk.jmurin.android.testy.entities.Question;
 import sk.jmurin.android.testy.entities.Test;
-import sk.jmurin.android.testy.entities.TestInformation;
-import sk.jmurin.android.testy.utils.DownloadEvents;
+import sk.jmurin.android.testy.utils.EventBusEvents;
 import sk.jmurin.android.testy.utils.Utils;
 
 
@@ -93,7 +90,7 @@ public class ProgressDialogFragment extends DialogFragment {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             dialog.dismiss();
-            EventBus.getDefault().post(new DownloadEvents.NewTestsDownloaded());
+            EventBus.getDefault().post(new EventBusEvents.NewTestsDownloaded());
         }
 
         @Override
@@ -111,7 +108,7 @@ public class ProgressDialogFragment extends DialogFragment {
                 InputStream is = null;
 
                 try {
-                    URL url = new URL("http://81.2.244.134/~vdesktop/testy/" + ti + ".txt");
+                    URL url = new URL(Secrets.DOMAIN + "/testy/" + ti + ".txt");
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     conn.setReadTimeout(5000 /* milliseconds */);// TODO: ohandlovat chyby
                     conn.setConnectTimeout(7000 /* milliseconds */);
@@ -151,14 +148,14 @@ public class ProgressDialogFragment extends DialogFragment {
                             for (Question q : test.questions) {
                                 ContentValues values = new ContentValues();
                                 values.put(DataContract.QuestionStats.QUESTION_TEST_ID, question_test_id);
-                                values.put(DataContract.QuestionStats.STAT, (int)(Math.random()*5-1));
+                                values.put(DataContract.QuestionStats.STAT, (int) (Math.random() * 5 - 1));
                                 values.put(DataContract.QuestionStats.TEST_NAME, test.name);
                                 values.put(DataContract.QuestionStats.TEST_VERSION, test.version);
                                 contentValues.add(values);
                                 question_test_id++;
                             }
                             int inserted = getActivity().getContentResolver().bulkInsert(insertUri, contentValues.toArray(new ContentValues[contentValues.size()]));
-                            Log.d(TAG,"inserted QuestionStats rows: "+inserted);
+                            Log.d(TAG, "inserted QuestionStats rows: " + inserted);
                         } catch (Exception e) {
                             e.printStackTrace();
                             // TODO: ohandlovat chybu ze sa nepodarilo naparsovat resource z rest servera

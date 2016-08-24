@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/TextAppearance.AppCompat.Headline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Aplikácia Testy" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Cieľom aplikácie Testy je zefektívniť učenie sa prostredníctvom testov a aplikovať princípy školy hrou." />
+
+        <TextView
+            style="@style/TextAppearance.AppCompat.Headline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Učiteľ" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Vytvára pre žiakov testy cez web rozhranie a má prehľad o ich priebežných výsledkoch." />
+
+        <TextView
+            style="@style/TextAppearance.AppCompat.Headline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Žiak" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Prostredníctvom tejto aplikácie si aktualizuje zoznam zadaných testov. Pre každý nový test má žiak počiatočné skóre 0% a testovaním sa so zadaných otázok sa mu skóre vylepšuje. V záložke Sieň slávy si vie pozrieť aktuálne skóre svojich spolužiakov. Súťaž vyhráva ten, kto prvý dosiahne 100%." />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/dalejButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="Ďalej" />
+</RelativeLayout>

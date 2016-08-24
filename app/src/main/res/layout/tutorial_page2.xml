@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/TextAppearance.AppCompat.Headline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Hodnotenie otázok" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Každá otázka je ohodnotená od 1 po 5 hviezdičiek podľa nasledovného pravidla:
+*		žiadna správna odpoveď
+**		ešte neriešená otázka
+***		jedna správna odpoveď
+****	dve správne odpovede
+*****	aspoň tri správne odpovede" />
+
+        <TextView
+            style="@style/TextAppearance.AppCompat.Headline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Značenie otázok" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Po označení odpovede na otázku a jej vyhodnotení sa odpovede zafarbia nasledovne:
+
+červená- označená nesprávna odpoveď
+zelená- označená správna odpoveď
+ružová- správna odpoveď, ktorá nie je označená" />
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/dalejButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="Ďalej" />
+</RelativeLayout>

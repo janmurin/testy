@@ -43,7 +43,7 @@ import sk.jmurin.android.testy.MainActivity;
 import sk.jmurin.android.testy.Secrets;
 import sk.jmurin.android.testy.content.DataContract;
 import sk.jmurin.android.testy.entities.TestStats;
-import sk.jmurin.android.testy.utils.DownloadEvents;
+import sk.jmurin.android.testy.utils.EventBusEvents;
 import sk.jmurin.android.testy.utils.NetworkUtils;
 import sk.jmurin.android.testy.R;
 import sk.jmurin.android.testy.entities.Test;
@@ -54,6 +54,7 @@ public class HomeFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     public static final String TAG = HomeFragment.class.getSimpleName();
+    public static final int DRAWER_POS = 0;
     private final OkHttpClient client = new OkHttpClient();
     private List<Test> jsonTests;
     private List<TestInformation> jsonTestsInfo;
@@ -240,9 +241,9 @@ public class HomeFragment extends Fragment {
                         // upovedomime aktivitu o vysledku requestu
                         if (!nove.isEmpty()) {
                             Log.d(TAG, "spustam stahovanie novych testov size: " + nove.size());
-                            EventBus.getDefault().post(new DownloadEvents.NewTestsToDownload(nove));
+                            EventBus.getDefault().post(new EventBusEvents.NewTestsToDownload(nove));
                         } else {
-                            EventBus.getDefault().post(new DownloadEvents.NothingToDownload());
+                            EventBus.getDefault().post(new EventBusEvents.NothingToDownload());
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -302,13 +303,13 @@ public class HomeFragment extends Fragment {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onDownloadEvent(final DownloadEvents.NewTestsDownloaded newTestsDownloaded) {
+    public void onDownloadEvent(final EventBusEvents.NewTestsDownloaded newTestsDownloaded) {
         Log.d(TAG, "onDownloadEvent: newTestsDownloaded");
         loadTestsFiles();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onDownloadEvent(final DownloadEvents.NothingToDownload noDownloadEvent) {
+    public void onDownloadEvent(final EventBusEvents.NothingToDownload noDownloadEvent) {
         Log.d(TAG, "onDownloadEvent: netreba stahovat nove testy: ");
         final TextView textView = new TextView(getActivity());
         textView.setText("Všetky testy sú aktuálne.");
@@ -321,7 +322,7 @@ public class HomeFragment extends Fragment {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onDownloadEvent(DownloadEvents.NewTestsToDownload noveTestyDownloadEvent) {
+    public void onDownloadEvent(EventBusEvents.NewTestsToDownload noveTestyDownloadEvent) {
         Log.d(TAG, "onDownloadEvent: treba stiahnut tieto testy: " + noveTestyDownloadEvent.nove);
         List<Integer> ids = new ArrayList<>();
         for (TestInformation ti : noveTestyDownloadEvent.nove) {

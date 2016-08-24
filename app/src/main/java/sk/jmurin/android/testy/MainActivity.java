@@ -1,5 +1,7 @@
 package sk.jmurin.android.testy;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -11,13 +13,231 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import sk.jmurin.android.testy.fragments.HomeFragment;
+import sk.jmurin.android.testy.fragments.TutorialPagerFragment;
+import sk.jmurin.android.testy.utils.EventBusEvents;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
+    private NavigationView navigationView;
 
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        Log.d(TAG, "onCreate");
+
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        loadUsernameFromPreferences();
+        if (!isUsernameRegistered()) {
+            // spustime tutorial aby si zaregistroval meno, pravdepodobne je to prve spustenie aplikacie
+            displayTutorial(false);
+        } else {
+            displayHome();
+        }
+
+    }
+
+    private boolean isUsernameRegistered() {
+        return !App.USERNAME.equals(App.DEFAULT_USERNAME);
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        Log.d(TAG, "onBackPressed");
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            // ak sme hocikde okrem homeFragmentu tak backbutton nas vrati do homeFragmentu
+            // z homeFragmentu ideme prec z aplikacie
+            if (navigationView.getMenu().getItem(HomeFragment.DRAWER_POS).isChecked()) {
+                // sme na home fragmente, backbuttonom vyjdeme z aplikacie
+                super.onBackPressed();
+            } else {
+                // nie sme na home fragmente, backbuttonom sa chceme dostat na home fragment
+                if (isUsernameRegistered()) {
+                    // mame username takze mozeme zobrazit home fragment
+                    displayHome();
+                } else {
+                    // nemame este username
+                    // mal by teraz byt zobrazeny tutorial, tak nechceme z neho vyjst a chceme prinutit usera aby zadal nejake meno
+                    // ak je user na fragmente kde sa zadava meno a stlaci backbutton tak ho musi vyhodit z aplikacie von
+                    // ak je user v tutorialy na prvom alebo druhom screene, tak ho hodi na posledny kde treba zadat meno
+                    Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.content_frame);
+                    if (fragment instanceof TutorialPagerFragment) {
+                        TutorialPagerFragment tpf = (TutorialPagerFragment) fragment;
+                        int currentItem = tpf.mPager.getCurrentItem();
+                        if (currentItem == tpf.NUM_PAGES - 1) {
+                            // sme na poslednom iteme kde sa zadava meno, backbuttonom vyjst z aplikacie
+                            super.onBackPressed();
+                        } else {
+                            // sme v tutorialy a stlacili sme back, tak sa posunieme na posledny kde treba zadat meno
+                            // NUM_PAGES bude vzdy aspon 2, v tomto pripade bude urcite 3, pretoze 2 by bol len vtedy keby App.USERNAME nebol rovny DEFAULT_USERNAME
+                            // a teda isUsernameRegistered() by vratilo true a nemoze sa stat zeby bol v premennej App.USERNAME nekonzistentny stav pretoze zmeny premennej bezia na hlavnom vlakne sekvencne
+                            tpf.mPager.setCurrentItem(tpf.NUM_PAGES - 1);
+                            // bolo by ok aj keby sme nic neurobili
+                        }
+                    } else {
+                        // nahodou sme na nejakom inom fragmente, toto by sa nemalo nikdy stat
+                        Toast.makeText(this, "Nepozname svoje meno. Toto by sa nemalo nikdy stat.", Toast.LENGTH_LONG).show();
+                        displayTutorial(true);
+                    }
+                }
+            }
+        }
+    }
+
+    private void displayTutorial(boolean showLastTutorialItem) {
+        if (showLastTutorialItem) {
+            Toast.makeText(this, "Je potrebné zadať vaše meno.", Toast.LENGTH_SHORT).show();
+        }
+        showContentFragment(TutorialPagerFragment.getInstance(showLastTutorialItem), TutorialPagerFragment.TAG);
+        navigationView.getMenu().getItem(TutorialPagerFragment.DRAWER_POS).setChecked(true);
+    }
+
+    private void displayHome() {
+        showContentFragment(new HomeFragment(), HomeFragment.TAG);
+        navigationView.getMenu().getItem(HomeFragment.DRAWER_POS).setChecked(true);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume");
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        // nepustime usera, iba k tutorialu dokym nezada svoje meno
+        switch (id) {
+            case R.id.home:
+                if (!isUsernameRegistered()) {
+                    displayTutorial(true);
+                } else {
+                    displayHome();
+                }
+                break;
+            case R.id.hall_of_fame:
+                if (!isUsernameRegistered()) {
+                    displayTutorial(true);
+                } else {
+//                    showContentFragment(new HomeFragment(), HomeFragment.TAG);
+//                    navigationView.getMenu().getItem(HomeFragment.DRAWER_POS).setChecked(true);
+                }
+                break;
+            case R.id.tutorial:
+                displayTutorial(false);
+                break;
+//            case R.id.settings:
+//                break;
+            default:
+                Log.d(TAG, "onNavigationItemSelected default case");
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    private void showContentFragment(Fragment fragment, String tag) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.content_frame, fragment, tag)
+                .commit();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventBusEvent(EventBusEvents.UsernameSelected usernameEvent) {
+        Log.d(TAG, "onEventBusEvent: UsernameSelected " + usernameEvent.meno);
+        displayHome();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventBusEvent(EventBusEvents.ZavrietTutorial zavriet) {
+        Log.d(TAG, "onEventBusEvent(EventBusEvents.ZavrietTutorial zavriet)");
+        displayHome();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+        Log.d(TAG, "onStart");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+    private void loadUsernameFromPreferences() {
+        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        App.USERNAME = sharedPref.getString(getString(R.string.username_preference_key), App.DEFAULT_USERNAME);
+    }
+
+    //
+//        if(savedInstanceState!=null){
+//            getLoaderManager().restartLoader(LOCAL_STATS_LOADER_ID, Bundle.EMPTY, localCursorLoader);
+//        }else {
+//            getLoaderManager().initLoader(LOCAL_STATS_LOADER_ID, Bundle.EMPTY, localCursorLoader);
+//        }
+//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+//            }
+//        });
 //    private class LocalStatsCursorLoader implements LoaderManager.LoaderCallbacks<Cursor> {
 //        MainActivity parent;
 //
@@ -79,115 +299,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //
 //    private LocalStatsCursorLoader localCursorLoader = new LocalStatsCursorLoader(this);
 //    private static final int LOCAL_STATS_LOADER_ID = 2;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-//
-//        if(savedInstanceState!=null){
-//            getLoaderManager().restartLoader(LOCAL_STATS_LOADER_ID, Bundle.EMPTY, localCursorLoader);
-//        }else {
-//            getLoaderManager().initLoader(LOCAL_STATS_LOADER_ID, Bundle.EMPTY, localCursorLoader);
-//        }
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        // check if there's any retained content fragment, if not, show home
-        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.content_frame);
-        if (fragment == null) {
-            showContentFragment(new HomeFragment(), HomeFragment.TAG);
-            navigationView.getMenu().getItem(0).setChecked(true);
-        }
-    }
-
-
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        switch(id){
-            case R.id.home:break;
-            case R.id.hall_of_fame:break;
-            case R.id.tutorial:break;
-            case R.id.settings:break;
-            default: Log.d(TAG,"onNavigationItemSelected default case");
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
-
-    private void showContentFragment(Fragment fragment, String tag) {
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.content_frame, fragment, tag)
-                .commit();
-    }
-
-//    @Override
-//    protected void onStart() {
-//        super.onStart();
-//        EventBus.getDefault().register(this);
-//    }
-//
-//    @Override
-//    protected void onStop() {
-//        super.onStop();
-//        EventBus.getDefault().unregister(this);
-//    }
-
 
 }
