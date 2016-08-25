@@ -1,4 +1,4 @@
-package sk.jmurin.android.testy;
+package sk.jmurin.android.testy.gui;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -19,6 +19,8 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import sk.jmurin.android.testy.App;
+import sk.jmurin.android.testy.R;
 import sk.jmurin.android.testy.fragments.HomeFragment;
 import sk.jmurin.android.testy.fragments.TutorialPagerFragment;
 import sk.jmurin.android.testy.utils.EventBusEvents;
@@ -131,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
+        //getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
@@ -222,6 +224,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void loadUsernameFromPreferences() {
         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         App.USERNAME = sharedPref.getString(getString(R.string.username_preference_key), App.DEFAULT_USERNAME);
+        App.DEVICE_ID = sharedPref.getString(getString(R.string.device_id_preference_key), null);
+        Log.d(TAG, "nacitane username a uuid: " + App.USERNAME + " " + App.DEVICE_ID);
     }
 
     //

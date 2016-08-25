@@ -21,12 +21,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import sk.jmurin.android.testy.InstanciaTestu;
-import sk.jmurin.android.testy.QuestionActivity;
+import sk.jmurin.android.testy.gui.InstanciaTestu;
+import sk.jmurin.android.testy.gui.QuestionActivity;
 import sk.jmurin.android.testy.R;
 import sk.jmurin.android.testy.entities.Question;
 import sk.jmurin.android.testy.entities.Test;
-import sk.jmurin.android.testy.entities.TestStats;
 
 /**
  * Created by jan.murin on 18-Aug-16.
@@ -46,9 +45,7 @@ public class TestParametersDialogFragment extends DialogFragment {
     private LinearLayout rozsahLayout;
 
     private static final String TEST_PARAM = "param1";
-    private static final String TEST_STATS_PARAM = "param2";
     private Test test;
-    private TestStats testStats;
     private Spinner maxSpinner;
     private Spinner minSpinner;
     private RadioButton vsetkySkoreRadioButton;
@@ -61,11 +58,10 @@ public class TestParametersDialogFragment extends DialogFragment {
         // Required empty public constructor
     }
 
-    public static TestParametersDialogFragment newInstance(Test test, TestStats testsStats) {
+    public static TestParametersDialogFragment newInstance(Test test) {
         TestParametersDialogFragment fragment = new TestParametersDialogFragment();
         Bundle args = new Bundle();
         args.putSerializable(TEST_PARAM, test);
-        args.putSerializable(TEST_STATS_PARAM, testsStats);
         fragment.setArguments(args);
         return fragment;
     }
@@ -75,7 +71,6 @@ public class TestParametersDialogFragment extends DialogFragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             test = (Test) getArguments().getSerializable(TEST_PARAM);
-            testStats = (TestStats) getArguments().getSerializable(TEST_STATS_PARAM);
         }
         setCancelable(true);
     }
@@ -122,7 +117,7 @@ public class TestParametersDialogFragment extends DialogFragment {
         rozsahLayout = (LinearLayout) view.findViewById(R.id.rozsahLayout);
         minSpinner = (Spinner) view.findViewById(R.id.minSpinner);
         maxSpinner = (Spinner) view.findViewById(R.id.maxSpinner);
-        initSpinnerAdapters(1, test.questions.size());
+        initSpinnerAdapters(1, test.getQuestions().size());
 
         // FILTER PODLA SKORE OTAZKY
         vsetkySkoreRadioButton = (RadioButton) view.findViewById(R.id.vsetkySkoreRadioButton);
@@ -165,7 +160,7 @@ public class TestParametersDialogFragment extends DialogFragment {
                     odfiltrujOtazky();
                 }
 
-                InstanciaTestu it = new InstanciaTestu(test, vybrane, testStats);
+                InstanciaTestu it = new InstanciaTestu(test, vybrane);
 
                 Intent intent = new Intent(getActivity(), QuestionActivity.class);
                 intent.putExtra(QuestionActivity.TEST_INSTANCIA_BUNDLE_KEY, it);
@@ -193,7 +188,7 @@ public class TestParametersDialogFragment extends DialogFragment {
         int max;
         if (vsetkyRozsahRadioButton.isChecked()) {
             min = 1;
-            max = test.questions.size();
+            max = test.getQuestions().size();
         } else {
             min = (int) minSpinner.getSelectedItem();
             max = (int) maxSpinner.getSelectedItem();
@@ -208,9 +203,9 @@ public class TestParametersDialogFragment extends DialogFragment {
         System.out.println("vybrane hodnoty min: " + min + " max: " + max);
         vybrane = new ArrayList<>();
         for (int i = min - 1; i < max; i++) { // 1..10 == 0..9 v liste
-            int stat = testStats.stats.get(i).stat; // otazky v teste su v rovnakom poradi ako v teststats
+            int stat = test.getQuestions().get(i).getStat(); // otazky v teste su v rovnakom poradi ako v teststats
             if (vyhovujeCheckboxomOtazka(stat)) {
-                vybrane.add(test.questions.get(i));
+                vybrane.add(test.getQuestions().get(i));
             }
             mapa.put(stat, mapa.get(stat) + 1);
         }

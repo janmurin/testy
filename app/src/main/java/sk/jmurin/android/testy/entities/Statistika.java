@@ -16,5 +16,6 @@ public class Statistika implements Serializable {
     public boolean test;
     public boolean trening;
     public boolean ucenie;
+    public String serverStatistika;
 
 }

@@ -1,0 +1,211 @@
+{
+  "name": "Skúšobný test",
+  "version": 1,
+  "id":1,
+  "questions": [
+    {
+      "question": "Hlavné mesto Slovenska je:",
+      "answers": [
+        {
+          "text": "Bratislava",
+          "isCorrect": true
+        },
+        {
+          "text": "Košice",
+          "isCorrect": false
+        },
+        {
+          "text": "Banská Bystrica",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Prezidentom Slovenskej Republiky je:",
+      "answers": [
+        {
+          "text": "Andrej Kiska",
+          "isCorrect": true
+        },
+        {
+          "text": "Robert Fico",
+          "isCorrect": false
+        },
+        {
+          "text": "Robert Kaliňák",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Zelený dres na Tour de France 2016 získal:",
+      "answers": [
+        {
+          "text": "Peter Sagan",
+          "isCorrect": true
+        },
+        {
+          "text": "Peter Velits",
+          "isCorrect": false
+        },
+        {
+          "text": "Chris Froome",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Slovensko susedí s:",
+      "answers": [
+        {
+          "text": "Rakúsko",
+          "isCorrect": true
+        },
+        {
+          "text": "Bulharsko",
+          "isCorrect": false
+        },
+        {
+          "text": "Rusko",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Najvyšší vrch Slovenska je:",
+      "answers": [
+        {
+          "text": "Gerlachovský štít",
+          "isCorrect": true
+        },
+        {
+          "text": "Lomnický štít",
+          "isCorrect": false
+        },
+        {
+          "text": "Kriváň",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Predsedom vlády Slovenskej Republiky je:",
+      "answers": [
+        {
+          "text": "Robert Fico",
+          "isCorrect": true
+        },
+        {
+          "text": "Robert Kaliňák",
+          "isCorrect": false
+        },
+        {
+          "text": "Radoslav Procházka",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Najbližšou hviezdou k planéte Zem je:",
+      "answers": [
+        {
+          "text": "Slnko",
+          "isCorrect": true
+        },
+        {
+          "text": "Alpha Centauri",
+          "isCorrect": false
+        },
+        {
+          "text": "Proxima Centauri",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Facebook založil:",
+      "answers": [
+        {
+          "text": "Mark Zuckerberg",
+          "isCorrect": true
+        },
+        {
+          "text": "Steve Jobs",
+          "isCorrect": false
+        },
+        {
+          "text": "Bill Gates",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Prezidentom Ruskej federácie je:",
+      "answers": [
+        {
+          "text": "Vladimir Putin",
+          "isCorrect": true
+        },
+        {
+          "text": "Dmitri Medvedev",
+          "isCorrect": false
+        },
+        {
+          "text": "Sergey Lavrov",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Najrozšírenejší operačný systém na notebookoch je:",
+      "answers": [
+        {
+          "text": "Windows",
+          "isCorrect": true
+        },
+        {
+          "text": "Mac OS",
+          "isCorrect": false
+        },
+        {
+          "text": "Android",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Najdlhšou riekou Slovenska je:",
+      "answers": [
+        {
+          "text": "Váh",
+          "isCorrect": true
+        },
+        {
+          "text": "Dunaj",
+          "isCorrect": false
+        },
+        {
+          "text": "Ondava",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Aktuálnym pápežom katolíckej cirkvi je:",
+      "answers": [
+        {
+          "text": "František",
+          "isCorrect": true
+        },
+        {
+          "text": "Benedikt XVI",
+          "isCorrect": false
+        },
+        {
+          "text": "Ján Pavol II",
+          "isCorrect": false
+        }
+      ]
+    }
+  ]
+}

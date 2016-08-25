@@ -10,4 +10,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="preference_file_key">sk.jmurin.android.testy.PREFERENCES_FILE_KEY</string>
     <string name="username_preference_key">username_preference_key</string>
+    <string name="device_id_preference_key">device_id_preference_key</string>
+    <string name="assets_tests_initialized_preference_key">assetsTestsInitialized</string>
 </resources>

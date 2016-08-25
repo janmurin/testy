@@ -19,6 +19,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import sk.jmurin.android.testy.App;
 import sk.jmurin.android.testy.R;
+import sk.jmurin.android.testy.gui.ZoomOutPageTransformer;
 import sk.jmurin.android.testy.utils.EventBusEvents;
 
 
@@ -54,6 +55,7 @@ public class TutorialPagerFragment extends Fragment {
             // je zadany username, takze posledny item nam netreba zobrazovat
             NUM_PAGES = 2;
         }
+        getActivity().setTitle("Tutoriál");
     }
 
     @Override
@@ -68,6 +70,7 @@ public class TutorialPagerFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = (ViewPager) view.findViewById(R.id.pager);
+        mPager.setPageTransformer(true, new ZoomOutPageTransformer());
         mPagerAdapter = new ScreenSlidePagerAdapter(getActivity().getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
         if (showLastItem) {

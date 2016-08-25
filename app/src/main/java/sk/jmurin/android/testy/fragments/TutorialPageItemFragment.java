@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,8 +15,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
+
+import java.util.UUID;
 
 import sk.jmurin.android.testy.App;
 import sk.jmurin.android.testy.R;
@@ -117,14 +121,26 @@ public class TutorialPageItemFragment extends Fragment {
                                         .show();
                             } else {
                                 // user vlozil korektne meno
+                                final TelephonyManager tm = (TelephonyManager) getActivity().getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
+                                final String tmDevice, tmSerial, androidId;
+                                tmDevice = "" + tm.getDeviceId();
+                                tmSerial = "" + tm.getSimSerialNumber();
+                                androidId = "" + android.provider.Settings.Secure.getString(getActivity().getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
+                                UUID deviceUuid = new UUID(androidId.hashCode(), ((long) tmDevice.hashCode() << 32) | tmSerial.hashCode());
+                                String deviceId = deviceUuid.toString();
+
                                 SharedPreferences sharedPref = getActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
                                 SharedPreferences.Editor editor = sharedPref.edit();
                                 editor.putString(getString(R.string.username_preference_key), meno);
+                                editor.putString(getString(R.string.device_id_preference_key), deviceId);
                                 boolean commitSuccessful = editor.commit();
                                 if (commitSuccessful) {
                                     App.USERNAME = meno;
-                                    Log.d(TAG, "zadane username: [" + meno + "]");
+                                    App.DEVICE_ID = deviceId;
+                                    Log.d(TAG, "zadane username: [" + meno + "] UUID:[" + deviceId + "]");
                                     EventBus.getDefault().post(new EventBusEvents.UsernameSelected(meno));
+                                } else {
+                                    Toast.makeText(getActivity(), "Nepodarilo sa uložiť vaše meno. Skúste znova.", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         }

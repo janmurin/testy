@@ -2,16 +2,16 @@ package sk.jmurin.android.testy.utils;
 
 import java.util.List;
 
-import sk.jmurin.android.testy.entities.TestInformation;
 
 /**
  * Created by jan.murin on 16-Aug-16.
  */
 public final class EventBusEvents {
     public static class NewTestsToDownload {
-        public final List<TestInformation> nove;
 
-        public NewTestsToDownload(List<TestInformation> nove) {
+        private final List<Integer> nove;
+
+        public NewTestsToDownload(List<Integer> nove) {
             this.nove = nove;
         }
     }

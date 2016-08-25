@@ -38,10 +38,9 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
     private String createQuestionsStatsTable() {
         final String query = DbUtils.TableBuilder.table(DataContract.Tables.QUESTION_STATS)
                 .primaryKey(DataContract.QuestionStats._ID)
-                .columnText(DataContract.QuestionStats.TEST_NAME)
-                .columnInt(DataContract.QuestionStats.TEST_VERSION)
+                .columnInt(DataContract.QuestionStats.TEST_ID)
                 .columnInt(DataContract.QuestionStats.STAT)
-                .columnInt(DataContract.QuestionStats.QUESTION_TEST_ID)
+                .columnInt(DataContract.QuestionStats.TEST_QUESTION_INDEX)
                 .build();
         Log.d(TAG, "query: "+query);
         return query;

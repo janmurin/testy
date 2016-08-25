@@ -8,20 +8,41 @@ import java.util.List;
  * Created by jan.murin on 15-Aug-16.
  */
 public class Test implements Serializable {
-    public String name;
-    public int version;
-    public boolean isSingleAnswer = true;
-    public List<Question> questions = new ArrayList<>();
+    private   String name;
+    private   int version;
+    private   int id;
+    private   List<Question> questions;
 
+    public String getName() {
+        return name;
+    }
 
-    @Override
-    public String toString() {
-        return "Test{" +
-                "name='" + name + '\'' +
-                ", version=" + version +
-                ", isSingleAnswer=" + isSingleAnswer +
-                ", questions=" + questions +
-                '}';
+    void setName(String name) {
+        this.name = name;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    void setVersion(int version) {
+        this.version = version;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    void setId(int id) {
+        this.id = id;
+    }
+
+    public List<Question> getQuestions() {
+        return questions;
+    }
+
+    void setQuestions(List<Question> questions) {
+        this.questions = questions;
     }
 
     @Override
@@ -31,15 +52,24 @@ public class Test implements Serializable {
 
         Test test = (Test) o;
 
-        if (version != test.version) return false;
-        return name.equals(test.name);
+        return id == test.id;
 
     }
 
     @Override
     public int hashCode() {
-        int result = name.hashCode();
-        result = 31 * result + version;
-        return result;
+        return id;
+    }
+
+    public int getSkorePercento() {
+        int percento = 0;
+        for (int j = 0; j < questions.size(); j++) {
+            int stat = questions.get(j).getStat();
+            if (stat >= 0) {
+                percento += stat;
+            }
+        }
+        percento = (int) (percento / (double) (questions.size() * 3) * 100);
+        return percento;
     }
 }

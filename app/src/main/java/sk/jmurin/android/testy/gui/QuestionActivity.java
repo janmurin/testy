@@ -1,6 +1,5 @@
-package sk.jmurin.android.testy;
+package sk.jmurin.android.testy.gui;
 
-import android.app.AlertDialog;
 import android.content.AsyncQueryHandler;
 import android.content.ContentValues;
 import android.content.Context;
@@ -11,31 +10,25 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import junit.framework.Assert;
 
-import java.text.DecimalFormat;
 import java.util.List;
 
+import sk.jmurin.android.testy.R;
 import sk.jmurin.android.testy.content.DataContract;
 import sk.jmurin.android.testy.content.Defaults;
-import sk.jmurin.android.testy.content.MyContentProvider;
 import sk.jmurin.android.testy.entities.Answer;
 import sk.jmurin.android.testy.entities.Question;
-import sk.jmurin.android.testy.entities.Statistika;
-import sk.jmurin.android.testy.entities.Test;
 import sk.jmurin.android.testy.fragments.StatistikaDialogFragment;
-import sk.jmurin.android.testy.fragments.TestParametersDialogFragment;
 
 public class QuestionActivity extends AppCompatActivity {
 
@@ -93,7 +86,7 @@ public class QuestionActivity extends AppCompatActivity {
     private void loadAktualnaOtazka() {
         System.out.println("loadAktualnaOtazka: ziskavam otazku s id: " + instanciaTestu.idckaUloh[instanciaTestu.aktUlohaIdx][0]);
         aktualnaOtazka = getOtazkaPodlaID(instanciaTestu.idckaUloh[instanciaTestu.aktUlohaIdx][0]);
-        setTitle(instanciaTestu.test.name + " " + (instanciaTestu.aktUlohaIdx + 1) + "/" + instanciaTestu.idckaUloh.length);
+        setTitle(instanciaTestu.test.getName() + " " + (instanciaTestu.aktUlohaIdx + 1) + "/" + instanciaTestu.idckaUloh.length);
         refreshOtazkaLabels();
         if (instanciaTestu.ohodnotene[instanciaTestu.aktUlohaIdx]) {
             skontrolujOdpovedeAVykresli();
@@ -104,9 +97,9 @@ public class QuestionActivity extends AppCompatActivity {
 
     private void refreshOtazkaLabels() {
         Log.d(TAG, "refreshOtazkaLabels");
-        otazkaTextView.setText(aktualnaOtazka.question);
+        otazkaTextView.setText(aktualnaOtazka.getQuestion());
 
-        odpovedeListViewAdapter = new OdpovedeListViewAdapter(this, R.layout.answer_list_item, aktualnaOtazka.answers, instanciaTestu.odpovedeOrder[instanciaTestu.aktUlohaIdx]);
+        odpovedeListViewAdapter = new OdpovedeListViewAdapter(this, R.layout.answer_list_item, aktualnaOtazka.getAnswers(), instanciaTestu.odpovedeOrder[instanciaTestu.aktUlohaIdx]);
         odpovedeListView.setAdapter(odpovedeListViewAdapter);
         for (int i = 0; i < instanciaTestu.POCET_ODPOVEDI; i++) {
             odpovedeListViewAdapter.setBackgroundColor(Color.WHITE, i);
@@ -164,7 +157,7 @@ public class QuestionActivity extends AppCompatActivity {
     }
 
     private Question getOtazkaPodlaID(int id) {
-        return instanciaTestu.test.questions.get(id);
+        return instanciaTestu.test.getQuestions().get(id);
     }
 
     private void zobrazStatistikaActivity() {
@@ -226,7 +219,7 @@ public class QuestionActivity extends AppCompatActivity {
         final int novyStat = instanciaTestu.idckaUloh[instanciaTestu.aktUlohaIdx][2];
         final int db_id = instanciaTestu.idckaUloh[instanciaTestu.aktUlohaIdx][3];
         // update testStatu vytiahnuteho z databazy TODO: bude mat homefragment referenciu na tuto zmenu?
-        instanciaTestu.testStats.stats.get(instanciaTestu.idckaUloh[instanciaTestu.aktUlohaIdx][0]).stat = novyStat;
+        instanciaTestu.test.getQuestions().get(instanciaTestu.idckaUloh[instanciaTestu.aktUlohaIdx][0]).setStat(novyStat);
         // update hodnoty v databaze
         Uri uri = DataContract.QuestionStats.CONTENT_URI
                 .buildUpon()
@@ -250,14 +243,13 @@ public class QuestionActivity extends AppCompatActivity {
                 if (cursor.moveToNext()) {
                     int stat = cursor.getInt(cursor.getColumnIndex(DataContract.QuestionStats.STAT));
                     int db_id2 = cursor.getInt(cursor.getColumnIndex(DataContract.QuestionStats._ID));
-                    int question_test_id = cursor.getInt(cursor.getColumnIndex(DataContract.QuestionStats.QUESTION_TEST_ID));
-                    String test_name = cursor.getString(cursor.getColumnIndex(DataContract.QuestionStats.TEST_NAME));
-                    int test_version = cursor.getInt(cursor.getColumnIndex(DataContract.QuestionStats.TEST_VERSION));
+                    int question_test_id = cursor.getInt(cursor.getColumnIndex(DataContract.QuestionStats.TEST_QUESTION_INDEX));
+//                    String test_name = cursor.getString(cursor.getColumnIndex(DataContract.QuestionStats.TEST_NAME));
+                    int test_id = cursor.getInt(cursor.getColumnIndex(DataContract.QuestionStats.TEST_ID));
                     System.out.println("stat=" + stat);
                     System.out.println("db_id=" + db_id2);
                     System.out.println("question_test_id=" + question_test_id);
-                    System.out.println("test_name=" + test_name);
-                    System.out.println("test_version=" + test_version);
+                    System.out.println("test_id=" + test_id);
                     // check ze vlozilo to do DB tam kde to malo to co malo
                     Assert.assertTrue(novyStat == stat && db_id2 == db_id);
                 } else {
@@ -292,7 +284,7 @@ public class QuestionActivity extends AppCompatActivity {
             //System.out.print(String.format("%3s", test.zaskrtnute[test.aktUlohaIdx][i]));
             // vyhodnotime itu odpoved, pozerame sa na odpovedeOrder lebo su v pomiesanom poradi
             if (instanciaTestu.zaskrtnute[instanciaTestu.aktUlohaIdx][i] == 1) {
-                if (aktualnaOtazka.answers.get(instanciaTestu.odpovedeOrder[instanciaTestu.aktUlohaIdx][i]).isCorrect) {
+                if (aktualnaOtazka.getAnswers().get(instanciaTestu.odpovedeOrder[instanciaTestu.aktUlohaIdx][i]).isCorrect()) {
                     // je oznacena spravna odpoved
                     //odpovedeTextView[i].setBackgroundColor(spravnaOdpovedFarba);
                     odpovedeListViewAdapter.setBackgroundColor(spravnaOdpovedFarba, i);
@@ -306,7 +298,7 @@ public class QuestionActivity extends AppCompatActivity {
                     odpovedeListViewAdapter.setBackgroundColor(nespravnaOdpovedFarba, i);
                 }
             } else {
-                if (aktualnaOtazka.answers.get(instanciaTestu.odpovedeOrder[instanciaTestu.aktUlohaIdx][i]).isCorrect) {
+                if (aktualnaOtazka.getAnswers().get(instanciaTestu.odpovedeOrder[instanciaTestu.aktUlohaIdx][i]).isCorrect()) {
                     // nie je oznacena spravna odpoved
                     if (!instanciaTestu.ohodnotene[instanciaTestu.aktUlohaIdx]) {
                         instanciaTestu.pocetMinusBodov--;
@@ -374,7 +366,7 @@ public class QuestionActivity extends AppCompatActivity {
             if (vi == null)
                 vi = inflater.inflate(R.layout.answer_list_item, null);
             TextView answerTextView = (TextView) vi.findViewById(R.id.answerTextView);
-            answerTextView.setText(answers.get(ordering[position]).text);
+            answerTextView.setText(answers.get(ordering[position]).getText());
             answerTextView.setBackgroundColor(backgroundColors[position]);
             TextView orderTextView = (TextView) vi.findViewById(R.id.orderTextView);
             orderTextView.setText(orderings[position]);

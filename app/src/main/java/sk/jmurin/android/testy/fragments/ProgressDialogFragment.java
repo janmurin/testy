@@ -30,7 +30,6 @@ import sk.jmurin.android.testy.content.DataContract;
 import sk.jmurin.android.testy.entities.Question;
 import sk.jmurin.android.testy.entities.Test;
 import sk.jmurin.android.testy.utils.EventBusEvents;
-import sk.jmurin.android.testy.utils.Utils;
 
 
 public class ProgressDialogFragment extends DialogFragment {
@@ -101,88 +100,88 @@ public class ProgressDialogFragment extends DialogFragment {
 
         @Override
         protected Void doInBackground(ArrayList<Integer>... params) {
-            int count = 0;
-            ArrayList<Integer> nove = params[0];
-            //TODO: odoslat viacej idciek a vratit viacej testov naraz
-            for (Integer ti : nove) {
-                InputStream is = null;
-
-                try {
-                    URL url = new URL(Secrets.DOMAIN + "/testy/" + ti + ".txt");
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setReadTimeout(5000 /* milliseconds */);// TODO: ohandlovat chyby
-                    conn.setConnectTimeout(7000 /* milliseconds */);
-                    conn.setRequestMethod("GET");
-                    conn.setDoInput(true);
-                    // Starts the query
-                    conn.connect();
-                    int response = conn.getResponseCode();
-                    Log.d(TAG, "The response is: " + response);
-                    if (response == HttpURLConnection.HTTP_OK) {
-                        is = conn.getInputStream();
-
-                        String responseJson = Utils.getStringUTFFromInputStream(is);
-                        Log.d(TAG, responseJson);
-
-                        try {
-                            ObjectMapper mapper = new ObjectMapper();
-                            Test test = mapper.readValue(responseJson, Test.class);
-                            //jsonTests.add(test);
-                            testsSize++;
-                            // pri parsovani nevyskocila vynimka takze mozeme ukladat tieto data do suboru
-                            String filename = "test" + testsSize;
-                            Log.d(TAG, "filename=[" + filename + "]");
-                            FileOutputStream outputStream;
-                            outputStream = getActivity().openFileOutput(filename, Context.MODE_PRIVATE);
-                            outputStream.write(responseJson.getBytes());
-                            outputStream.close();
-                            Log.d(TAG, "ulozeny test " + test);
-
-                            // ulozit do databazy statistiky
-                            Uri insertUri = DataContract.QuestionStats.CONTENT_URI
-                                    .buildUpon()
-                                    .build();
-
-                            List<ContentValues> contentValues = new ArrayList<>();
-                            int question_test_id = 0;
-                            for (Question q : test.questions) {
-                                ContentValues values = new ContentValues();
-                                values.put(DataContract.QuestionStats.QUESTION_TEST_ID, question_test_id);
-                                values.put(DataContract.QuestionStats.STAT, (int) (Math.random() * 5 - 1));
-                                values.put(DataContract.QuestionStats.TEST_NAME, test.name);
-                                values.put(DataContract.QuestionStats.TEST_VERSION, test.version);
-                                contentValues.add(values);
-                                question_test_id++;
-                            }
-                            int inserted = getActivity().getContentResolver().bulkInsert(insertUri, contentValues.toArray(new ContentValues[contentValues.size()]));
-                            Log.d(TAG, "inserted QuestionStats rows: " + inserted);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            // TODO: ohandlovat chybu ze sa nepodarilo naparsovat resource z rest servera
-                        }
-                        count++;
-                        publishProgress(count);
-                    } else {
-                        //TODO: ohandlovat chybu ze server nevratil kod 200
-                        Log.e(TAG, "nepodarilo sa ziskat resource: [" + url.toString() + "]");
-                    }
-                } catch (ProtocolException e) {
-                    e.printStackTrace();
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    if (is != null) {
-                        try {
-                            is.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
-
+//            int count = 0;
+//            ArrayList<Integer> nove = params[0];
+//            //TODO: odoslat viacej idciek a vratit viacej testov naraz
+//            for (Integer ti : nove) {
+//                InputStream is = null;
+//
+//                try {
+//                    URL url = new URL(Secrets.DOMAIN + "/testy/" + ti + ".txt");
+//                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+//                    conn.setReadTimeout(5000 /* milliseconds */);// TODO: ohandlovat chyby
+//                    conn.setConnectTimeout(7000 /* milliseconds */);
+//                    conn.setRequestMethod("GET");
+//                    conn.setDoInput(true);
+//                    // Starts the query
+//                    conn.connect();
+//                    int response = conn.getResponseCode();
+//                    Log.d(TAG, "The response is: " + response);
+//                    if (response == HttpURLConnection.HTTP_OK) {
+//                        is = conn.getInputStream();
+//
+//                        String responseJson = Utils.getStringUTFFromInputStream(is);
+//                        Log.d(TAG, responseJson);
+//
+//                        try {
+//                            ObjectMapper mapper = new ObjectMapper();
+//                            Test test = mapper.readValue(responseJson, Test.class);
+//                            //jsonTests.add(test);
+//                            testsSize++;
+//                            // pri parsovani nevyskocila vynimka takze mozeme ukladat tieto data do suboru
+//                            String filename = "test" + testsSize;
+//                            Log.d(TAG, "filename=[" + filename + "]");
+//                            FileOutputStream outputStream;
+//                            outputStream = getActivity().openFileOutput(filename, Context.MODE_PRIVATE);
+//                            outputStream.write(responseJson.getBytes());
+//                            outputStream.close();
+//                            Log.d(TAG, "ulozeny test " + test);
+//
+//                            // ulozit do databazy statistiky
+//                            Uri insertUri = DataContract.QuestionStats.CONTENT_URI
+//                                    .buildUpon()
+//                                    .build();
+//
+//                            List<ContentValues> contentValues = new ArrayList<>();
+//                            int question_test_id = 0;
+//                            for (Question q : test.questions) {
+//                                ContentValues values = new ContentValues();
+//                                values.put(DataContract.QuestionStats.TEST_QUESTION_INDEX, question_test_id);
+//                                values.put(DataContract.QuestionStats.STAT, (int) (Math.random() * 5 - 1));
+//                                values.put(DataContract.QuestionStats.TEST_NAME, test.name);
+//                                values.put(DataContract.QuestionStats.TEST_VERSION, test.version);
+//                                contentValues.add(values);
+//                                question_test_id++;
+//                            }
+//                            int inserted = getActivity().getContentResolver().bulkInsert(insertUri, contentValues.toArray(new ContentValues[contentValues.size()]));
+//                            Log.d(TAG, "inserted QuestionStats rows: " + inserted);
+//                        } catch (Exception e) {
+//                            e.printStackTrace();
+//                            // TODO: ohandlovat chybu ze sa nepodarilo naparsovat resource z rest servera
+//                        }
+//                        count++;
+//                        publishProgress(count);
+//                    } else {
+//                        //TODO: ohandlovat chybu ze server nevratil kod 200
+//                        Log.e(TAG, "nepodarilo sa ziskat resource: [" + url.toString() + "]");
+//                    }
+//                } catch (ProtocolException e) {
+//                    e.printStackTrace();
+//                } catch (MalformedURLException e) {
+//                    e.printStackTrace();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                } finally {
+//                    if (is != null) {
+//                        try {
+//                            is.close();
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }
+//            }
+//
             return null;
         }
     }

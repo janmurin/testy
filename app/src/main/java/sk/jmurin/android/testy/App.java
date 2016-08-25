@@ -6,7 +6,6 @@ import android.util.Log;
 
 import java.util.Map;
 
-import sk.jmurin.android.testy.entities.TestStats;
 
 /**
  * Global {@link Application} class.
@@ -16,10 +15,10 @@ public class App extends Application {
     public static final String TAG = "Testy App";
     public static final String DEFAULT_USERNAME = "default";
     public static String USERNAME = DEFAULT_USERNAME;
-
+    public static String DEVICE_ID;
 
     private static Context sInstance;
-    public static Map<String, TestStats> testStatsMap;
+
 
     @Override
     public void onCreate() {

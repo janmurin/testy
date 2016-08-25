@@ -31,14 +31,16 @@ public class DataContract {
         int QUESTIONS_ID = 101;
     }
 
-    public interface QuestionColumns {
-        String TEST_NAME = "test_name";
-        String TEST_VERSION = "test_version";
-        String STAT = "question_stat";
-        String QUESTION_TEST_ID = "question_test_id";
+    public interface QuestionColumns extends BaseColumns{
+//        String TEST_NAME = "test_name";
+//        String TEST_VERSION = "test_version";
+
+        String TEST_ID = "test_id";
+        String STAT = "stat";
+        String TEST_QUESTION_INDEX = "test_question_index";
     }
 
-    public static final class QuestionStats implements BaseColumns, QuestionColumns {
+    public static final class QuestionStats implements QuestionColumns {
         public static final String CONTENT_TYPE = buildContentTypeDir(Tables.QUESTION_STATS);
         public static final Uri CONTENT_URI = Uri.withAppendedPath(AUTHORITY_URI, Tables.QUESTION_STATS);
         public static final String CONTENT_TYPE_ITEM = buildContentTypeItem(Tables.QUESTION_STAT_ID);

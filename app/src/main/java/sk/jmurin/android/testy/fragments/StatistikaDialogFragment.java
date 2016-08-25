@@ -9,19 +9,32 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
-import sk.jmurin.android.testy.InstanciaTestu;
-import sk.jmurin.android.testy.QuestionActivity;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.Headers;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import sk.jmurin.android.testy.App;
 import sk.jmurin.android.testy.R;
+import sk.jmurin.android.testy.Secrets;
 import sk.jmurin.android.testy.entities.Question;
 import sk.jmurin.android.testy.entities.Statistika;
+import sk.jmurin.android.testy.gui.InstanciaTestu;
+import sk.jmurin.android.testy.gui.QuestionActivity;
 
 /**
  * Created by jan.murin on 18-Aug-16.
@@ -69,6 +82,11 @@ public class StatistikaDialogFragment extends DialogFragment {
         st.zleZodpovedane = instanciaTestu.getZleZodpovedane();
         st.pribudlo = instanciaTestu.getPribudlo();
         st.ucenie = instanciaTestu.isUcenieSelected();
+        int[] serverStatiskikaArray = new int[instanciaTestu.test.getQuestions().size()];
+        for (int i = 0; i < instanciaTestu.test.getQuestions().size(); i++) {
+            serverStatiskikaArray[i] = instanciaTestu.test.getQuestions().get(i).getStat();
+        }
+        st.serverStatistika = Arrays.toString(serverStatiskikaArray);
         return st;
     }
 
@@ -94,7 +112,7 @@ public class StatistikaDialogFragment extends DialogFragment {
 
         uspesnostTextView.setText(df.format(statistika.uspesnost) + " %");
         spravnychTextView.setText(statistika.uspesnych + " z " + statistika.vyriesenych);
-        skoreTextView.setText(instanciaTestu.testStats.getSkorePercento() + " %");
+        skoreTextView.setText(instanciaTestu.test.getSkorePercento() + " %");
         if (statistika.uspesnych == statistika.vyriesenych) {
             hintTextView.setVisibility(View.GONE);
         }
@@ -112,10 +130,10 @@ public class StatistikaDialogFragment extends DialogFragment {
                 Log.d(TAG, "opakujeme test so zle zodpovedanymi otazkami");
                 List<Question> otazky = new ArrayList<>();
                 for (int i = 0; i < statistika.zleZodpovedane.length; i++) {
-                    otazky.add(instanciaTestu.test.questions.get(statistika.zleZodpovedane[i]));// idcko otazky je zhodne s poradovym cislom v zozname otazok
+                    otazky.add(instanciaTestu.test.getQuestions().get(statistika.zleZodpovedane[i]));// idcko otazky je zhodne s poradovym cislom v zozname otazok
                 }
                 dismiss();
-                InstanciaTestu it = new InstanciaTestu(instanciaTestu.test, otazky, instanciaTestu.testStats);
+                InstanciaTestu it = new InstanciaTestu(instanciaTestu.test, otazky);
                 it.setUcenieSelected(false);
                 instanciaTestu = null;
 
@@ -133,6 +151,66 @@ public class StatistikaDialogFragment extends DialogFragment {
                 getActivity().finish();
             }
         });
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        RequestBody formBody = new FormBody.Builder()
+                .add("username", App.USERNAME)
+                .add("deviceID", App.DEVICE_ID)
+                .add("testID", "" + instanciaTestu.test.getId())
+                .add("testVersion", "" + instanciaTestu.test.getVersion())
+                .add("timeCreated", sdf.format(new Date(System.currentTimeMillis())))
+                .add("stats", statistika.serverStatistika)
+                .build();
+        Request request = new Request.Builder()
+                .url(Secrets.TESTY_STATS_INSERT_API_URL)
+                .post(formBody)
+                .build();
+
+        final OkHttpClient client = new OkHttpClient();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.e(TAG, "onFailure");
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    Headers responseHeaders = response.headers();
+                    for (int i = 0, size = responseHeaders.size(); i < size; i++) {
+                        Log.d(TAG, responseHeaders.name(i) + ": " + responseHeaders.value(i));
+                    }
+
+                    String jsonResponse = response.body().string();
+                    Log.d(TAG, jsonResponse);
+//                    try {
+//                        ObjectMapper mapper = new ObjectMapper();
+//                        List<TestInformation> testsInfo = mapper.readValue(jsonResponse, new TypeReference<List<TestInformation>>() {
+//                        });
+//                        List<TestInformation> nove = new ArrayList<>();
+//                        for (TestInformation ti : testsInfo) {
+//                            if (!jsonTestsInfo.contains(ti)) {
+//                                nove.add(ti);
+//                            }
+//                        }
+//                        // upovedomime aktivitu o vysledku requestu
+//                        if (!nove.isEmpty()) {
+//                            Log.d(TAG, "spustam stahovanie novych testov size: " + nove.size());
+//                            EventBus.getDefault().post(new EventBusEvents.NewTestsToDownload(nove));
+//                        } else {
+//                            EventBus.getDefault().post(new EventBusEvents.NothingToDownload());
+//                        }
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                        // TODO: ohandlovat chybu ked sa nenaparsuje testsInfo
+//                    }
+                } else {
+                    //TODO: upozornit usera ze server neodpovedal spravne
+                    throw new IOException("Unexpected code " + response);
+                }
+            }
+        });
     }
 
     /**
@@ -144,4 +222,6 @@ public class StatistikaDialogFragment extends DialogFragment {
         dialog.setTitle("Vyhodnotenie");
         return dialog;
     }
+
+
 }

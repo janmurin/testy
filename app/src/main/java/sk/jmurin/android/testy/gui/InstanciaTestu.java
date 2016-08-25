@@ -1,4 +1,4 @@
-package sk.jmurin.android.testy;
+package sk.jmurin.android.testy.gui;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -8,7 +8,6 @@ import java.util.List;
 
 import sk.jmurin.android.testy.entities.Question;
 import sk.jmurin.android.testy.entities.Test;
-import sk.jmurin.android.testy.entities.TestStats;
 
 /**
  * Created by Janco1 on 26. 5. 2015.
@@ -16,7 +15,6 @@ import sk.jmurin.android.testy.entities.TestStats;
 public class InstanciaTestu implements Serializable {
 
     public final int POCET_ODPOVEDI;
-    public final TestStats testStats;
     public final Test test;
     public boolean ucenieSelected;
     public final int[][] idckaUloh;
@@ -28,10 +26,9 @@ public class InstanciaTestu implements Serializable {
     public int[][] zaskrtnute;
     public boolean[] ohodnotene;
 
-    public InstanciaTestu(Test test, List<Question> otazky, TestStats testStats) {// stats je komplet zoznam statistiky pre kazdu ulohu, z databazy
-        this.testStats = testStats;
+    public InstanciaTestu(Test test, List<Question> otazky) {// stats je komplet zoznam statistiky pre kazdu ulohu, z databazy
         this.test=test;
-        POCET_ODPOVEDI = test.questions.get(0).answers.size();
+        POCET_ODPOVEDI = test.getQuestions().get(0).getAnswers().size();
         // nainicializujeme si poradove cisla
         for (int i = 0; i < POCET_ODPOVEDI; i++) {
             cisla.add(i);
@@ -44,9 +41,9 @@ public class InstanciaTestu implements Serializable {
         zaskrtnute = new int[otazky.size()][POCET_ODPOVEDI]; // aby sme vedeli ktore sme ako zaskrtli
         ohodnotene = new boolean[otazky.size()];  // aby sme vedeli ktore ulohy su uz ohodnotene aby sa hned vykreslili
         for (int i = 0; i < otazky.size(); i++) {
-            idckaUloh[i][0] = otazky.get(i).id;
-            idckaUloh[i][1] = testStats.stats.get(otazky.get(i).id).stat;
-            idckaUloh[i][3] = testStats.stats.get(otazky.get(i).id).db_id;
+            idckaUloh[i][0] = otazky.get(i).getTestQuestionIndex();
+            idckaUloh[i][1] = test.getQuestions().get(otazky.get(i).getTestQuestionIndex()).getStat();
+            idckaUloh[i][3] = test.getQuestions().get(otazky.get(i).getTestQuestionIndex()).getDbID();
             Collections.shuffle(cisla); // pomiesame poradie odpovedi
             for (int j = 0; j < POCET_ODPOVEDI; j++) {
                 odpovedeOrder[i][j] = cisla.get(j);
