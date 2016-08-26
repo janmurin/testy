@@ -6,14 +6,20 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import sk.jmurin.android.testy.App;
 import sk.jmurin.android.testy.entities.Question;
 import sk.jmurin.android.testy.entities.Test;
 
 /**
  * Created by Janco1 on 26. 5. 2015.
  */
+
+/**
+ * Sluzi ako ulozisko dat pre QuestionActivity
+ */
 public class InstanciaTestu implements Serializable {
 
+    public static final String TAG = InstanciaTestu.class.getSimpleName();
     public final int POCET_ODPOVEDI;
     public final Test test;
     public boolean ucenieSelected;
@@ -59,7 +65,7 @@ public class InstanciaTestu implements Serializable {
         this.ucenieSelected = ucenieSelected;
         if (ucenieSelected) {
             Arrays.fill(ohodnotene, true);
-            System.out.println("ucenie selected: " + Arrays.toString(ohodnotene));
+            //System.out.println("ucenie selected: " + Arrays.toString(ohodnotene));
         }
     }
 
@@ -76,8 +82,10 @@ public class InstanciaTestu implements Serializable {
 
     public int[] getZleZodpovedane() {
         // iba z tych co su ohodnotene chceme vybrat tie idcka, kde sme zle odpovedali
-        System.out.println("getZleZodpovedane: ");
-        System.out.println("ohodnotenych: " + getOhodnotenych() + "  uspesnych: " + uspesnych);
+        //System.out.println("getZleZodpovedane: ");
+        App.zaloguj(App.DEBUG, TAG,"getZleZodpovedane: ");
+        //System.out.println("ohodnotenych: " + getOhodnotenych() + "  uspesnych: " + uspesnych);
+        App.zaloguj(App.DEBUG, TAG,"ohodnotenych: " + getOhodnotenych() + "  uspesnych: " + uspesnych);
         int[] zle = new int[getOhodnotenych() - uspesnych];
         int pocet = 0;
         for (int i = 0; i < idckaUloh.length; i++) {

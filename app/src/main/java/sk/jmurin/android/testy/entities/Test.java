@@ -57,6 +57,15 @@ public class Test implements Serializable {
     }
 
     @Override
+    public String toString() {
+        return "Test{" +
+                "id=" + id +
+                ", version=" + version +
+                ", name='" + name + '\'' +
+                '}';
+    }
+
+    @Override
     public int hashCode() {
         return id;
     }

@@ -18,9 +18,12 @@
 
         <EditText
             android:layout_width="300dp"
+            android:focusable="true"
             android:layout_height="wrap_content"
             android:id="@+id/menoEditText"
-            android:maxLength="10"/>
+            android:maxLength="10"
+            android:inputType="textPersonName"
+            android:imeOptions="actionDone"/>
     </LinearLayout>
 
     <Button
@@ -28,5 +31,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:focusable="true"
         android:text="Ďalej" />
 </RelativeLayout>

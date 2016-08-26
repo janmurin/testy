@@ -19,8 +19,13 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.Map;
+
 import sk.jmurin.android.testy.App;
 import sk.jmurin.android.testy.R;
+import sk.jmurin.android.testy.entities.Parser;
+import sk.jmurin.android.testy.entities.Test;
+import sk.jmurin.android.testy.fragments.HallOfFameFragment;
 import sk.jmurin.android.testy.fragments.HomeFragment;
 import sk.jmurin.android.testy.fragments.TutorialPagerFragment;
 import sk.jmurin.android.testy.utils.EventBusEvents;
@@ -29,6 +34,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private NavigationView navigationView;
+    private Map<Integer, Test> testy;
 
 
     @Override
@@ -50,6 +56,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView.setNavigationItemSelectedListener(this);
 
         loadUsernameFromPreferences();
+        // v tejto DEMO verzii budu testy napevno dane v assetoch,
+        // v buducnosti sa spravi stahovanie testov z rest servera ak bude zaujem rozsirovat aplikaciu
+        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        boolean assetsTestsInitialized = sharedPref.getBoolean(getString(R.string.assets_tests_initialized_preference_key), false);
+        // TODO: progress dialog na nacitavanie testov zo suboru?
+        if (!assetsTestsInitialized) {
+            testy = Parser.initTestsFromAssetsGetTests(this);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putBoolean(getString(R.string.assets_tests_initialized_preference_key), true);
+            boolean commit = editor.commit();
+            //Log.d(TAG, "ulozenie assetsTestsInitialized=" + commit);
+            App.zaloguj(App.DEBUG, TAG, "ulozenie assetsTestsInitialized=" + commit);
+        } else {
+            testy = Parser.loadTests(this);
+        }
+        //Log.d(TAG, "nacitanych testov: " + testy.size());
+        App.zaloguj(App.DEBUG, TAG, "nacitanych testov: " + testy.size());
+
         if (!isUsernameRegistered()) {
             // spustime tutorial aby si zaregistroval meno, pravdepodobne je to prve spustenie aplikacie
             displayTutorial(false);
@@ -66,7 +90,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onBackPressed() {
-        Log.d(TAG, "onBackPressed");
+        //Log.d(TAG, "onBackPressed");
+        App.zaloguj(App.DEBUG, TAG, "onBackPressed");
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
@@ -119,14 +144,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void displayHome() {
-        showContentFragment(new HomeFragment(), HomeFragment.TAG);
+        showContentFragment(HomeFragment.newInstance(testy), HomeFragment.TAG);
         navigationView.getMenu().getItem(HomeFragment.DRAWER_POS).setChecked(true);
+    }
+
+    private void displayHallOfFame() {
+        showContentFragment(HallOfFameFragment.newInstance(testy), HallOfFameFragment.TAG);
+        navigationView.getMenu().getItem(HallOfFameFragment.DRAWER_POS).setChecked(true);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d(TAG, "onResume");
+        //Log.d(TAG, "onResume");
+        App.zaloguj(App.DEBUG, TAG, "onResume");
     }
 
 
@@ -171,8 +202,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if (!isUsernameRegistered()) {
                     displayTutorial(true);
                 } else {
-//                    showContentFragment(new HomeFragment(), HomeFragment.TAG);
-//                    navigationView.getMenu().getItem(HomeFragment.DRAWER_POS).setChecked(true);
+                    displayHallOfFame();
                 }
                 break;
             case R.id.tutorial:
@@ -181,7 +211,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //            case R.id.settings:
 //                break;
             default:
-                Log.d(TAG, "onNavigationItemSelected default case");
+                //Log.d(TAG, "onNavigationItemSelected default case");
+                App.zaloguj(App.DEBUG, TAG, "onNavigationItemSelected default case");
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -198,13 +229,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventBusEvent(EventBusEvents.UsernameSelected usernameEvent) {
-        Log.d(TAG, "onEventBusEvent: UsernameSelected " + usernameEvent.meno);
+        //Log.d(TAG, "onEventBusEvent: UsernameSelected " + usernameEvent.meno);
+        App.zaloguj(App.DEBUG, TAG, "onEventBusEvent: UsernameSelected " + usernameEvent.meno);
         displayHome();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventBusEvent(EventBusEvents.ZavrietTutorial zavriet) {
-        Log.d(TAG, "onEventBusEvent(EventBusEvents.ZavrietTutorial zavriet)");
+        //Log.d(TAG, "onEventBusEvent(EventBusEvents.ZavrietTutorial zavriet)");
+        App.zaloguj(App.DEBUG, TAG, "onEventBusEvent(EventBusEvents.ZavrietTutorial zavriet)");
         displayHome();
     }
 
@@ -213,6 +246,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onStart();
         EventBus.getDefault().register(this);
         Log.d(TAG, "onStart");
+        App.zaloguj(App.DEBUG, TAG, "onStart");
     }
 
     @Override
@@ -225,7 +259,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         App.USERNAME = sharedPref.getString(getString(R.string.username_preference_key), App.DEFAULT_USERNAME);
         App.DEVICE_ID = sharedPref.getString(getString(R.string.device_id_preference_key), null);
-        Log.d(TAG, "nacitane username a uuid: " + App.USERNAME + " " + App.DEVICE_ID);
+        //Log.d(TAG, "nacitane username a uuid: " + App.USERNAME + " " + App.DEVICE_ID);
+        App.zaloguj(App.DEBUG, TAG, "nacitane username a uuid: " + App.USERNAME + " " + App.DEVICE_ID);
     }
 
     //

@@ -17,8 +17,10 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -127,7 +129,8 @@ public class StatistikaDialogFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 dismiss();
-                Log.d(TAG, "opakujeme test so zle zodpovedanymi otazkami");
+                //Log.d(TAG, "opakujeme test so zle zodpovedanymi otazkami");
+                App.zaloguj(App.DEBUG,TAG,"opakujeme test so zle zodpovedanymi otazkami");
                 List<Question> otazky = new ArrayList<>();
                 for (int i = 0; i < statistika.zleZodpovedane.length; i++) {
                     otazky.add(instanciaTestu.test.getQuestions().get(statistika.zleZodpovedane[i]));// idcko otazky je zhodne s poradovym cislom v zozname otazok
@@ -153,14 +156,16 @@ public class StatistikaDialogFragment extends DialogFragment {
         });
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Calendar instance = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
 
         RequestBody formBody = new FormBody.Builder()
                 .add("username", App.USERNAME)
                 .add("deviceID", App.DEVICE_ID)
                 .add("testID", "" + instanciaTestu.test.getId())
                 .add("testVersion", "" + instanciaTestu.test.getVersion())
-                .add("timeCreated", sdf.format(new Date(System.currentTimeMillis())))
+                .add("timeCreated", sdf.format(instance.getTime()))
                 .add("stats", statistika.serverStatistika)
+                .add("skore", "" + instanciaTestu.test.getSkorePercento())
                 .build();
         Request request = new Request.Builder()
                 .url(Secrets.TESTY_STATS_INSERT_API_URL)
@@ -171,7 +176,8 @@ public class StatistikaDialogFragment extends DialogFragment {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Log.e(TAG, "onFailure");
+                //Log.e(TAG, "onFailure");
+                App.zaloguj(App.DEBUG,TAG,"onFailure");
             }
 
             @Override

@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import sk.jmurin.android.testy.App;
 import sk.jmurin.android.testy.utils.DbUtils;
 
 
@@ -24,13 +25,15 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        Log.d(TAG, "onCreate");
+        //Log.d(TAG, "onCreate(SQLiteDatabase db)");
+        App.zaloguj(App.DEBUG,TAG,"onCreate(SQLiteDatabase db)");
         db.execSQL(createQuestionsStatsTable());
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        Log.d(TAG, "onUpgrade");
+        //Log.d(TAG, "onUpgrade");
+        App.zaloguj(App.DEBUG,TAG,"onUpgrade");
         db.execSQL(DbUtils.dropTable(DataContract.Tables.QUESTION_STATS));
         onCreate(db);
     }
@@ -42,7 +45,8 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
                 .columnInt(DataContract.QuestionStats.STAT)
                 .columnInt(DataContract.QuestionStats.TEST_QUESTION_INDEX)
                 .build();
-        Log.d(TAG, "query: "+query);
+        //Log.d(TAG, "query: "+query);
+        App.zaloguj(App.DEBUG,TAG,"query: "+query);
         return query;
     }
 }

@@ -16,6 +16,7 @@ public class App extends Application {
     public static final String DEFAULT_USERNAME = "default";
     public static String USERNAME = DEFAULT_USERNAME;
     public static String DEVICE_ID;
+    public static final String DEBUG = "debug";
 
     private static Context sInstance;
 
@@ -23,9 +24,18 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d(TAG, "App created...");
+        //Log.d(TAG, "App created...");
+        zaloguj(DEBUG, TAG, "App created...");
         sInstance = this;
-        //PlanetsProviderHelper.insertPlanets(this);
+    }
+
+    public static void zaloguj(String level, String TAG, String message) {
+        if (!BuildConfig.DEBUG) {
+            return;
+        }
+        if (level.equals(DEBUG)) {
+            Log.d(TAG, "MYAPP_ " + message);
+        }
     }
 
     public static Context getContext() {

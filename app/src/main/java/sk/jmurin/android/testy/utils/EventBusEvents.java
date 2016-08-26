@@ -36,6 +36,17 @@ public final class EventBusEvents {
     public static class ZavrietTutorial {
     }
 
+    public static class SkoreStatsDownloaded {
+    }
+
+    public static class DownloadError {
+        public final String s;
+
+        public DownloadError(String s) {
+            this.s=s;
+        }
+    }
+
 //    public static class Progress {
 //
 //        public final int progress;

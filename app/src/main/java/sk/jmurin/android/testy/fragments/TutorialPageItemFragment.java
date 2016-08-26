@@ -9,9 +9,12 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -94,12 +97,27 @@ public class TutorialPageItemFragment extends Fragment {
             case 2:
                 view = inflater.inflate(R.layout.tutorial_page3, container, false);
                 final EditText menoEditText = (EditText) view.findViewById(R.id.menoEditText);
-                Button dalejButton3 = (Button) view.findViewById(R.id.dalejButton);
+                menoEditText.requestFocus();
+                InputMethodManager inputManager =(InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),InputMethodManager.SHOW_IMPLICIT);
+                final Button dalejButton3 = (Button) view.findViewById(R.id.dalejButton);
                 dalejButton3.setText("Uložiť");
+                menoEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                        if (actionId == EditorInfo.IME_ACTION_DONE) {
+                            InputMethodManager inputManager =(InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                            inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),InputMethodManager.HIDE_NOT_ALWAYS);
+                            App.zaloguj(App.DEBUG,TAG,"action done");
+                            dalejButton3.performClick();
+                            return true;
+                        }
+                        return false;
+                    }
+                });
                 dalejButton3.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        String meno = menoEditText.getText().toString().trim();
+                        String meno = menoEditText.getText().toString().trim().replaceAll("\"","").replaceAll("\'","");
                         if (meno.length() < 5) {
                             final TextView textView = new TextView(getActivity());
                             textView.setText("Zadané meno musí mať aspoň 5 znakov.");
@@ -137,7 +155,8 @@ public class TutorialPageItemFragment extends Fragment {
                                 if (commitSuccessful) {
                                     App.USERNAME = meno;
                                     App.DEVICE_ID = deviceId;
-                                    Log.d(TAG, "zadane username: [" + meno + "] UUID:[" + deviceId + "]");
+                                    //Log.d(TAG, "zadane username: [" + meno + "] UUID:[" + deviceId + "]");
+                                    App.zaloguj(App.DEBUG,TAG,"zadane username: [" + meno + "] UUID:[" + deviceId + "]");
                                     EventBus.getDefault().post(new EventBusEvents.UsernameSelected(meno));
                                 } else {
                                     Toast.makeText(getActivity(), "Nepodarilo sa uložiť vaše meno. Skúste znova.", Toast.LENGTH_SHORT).show();

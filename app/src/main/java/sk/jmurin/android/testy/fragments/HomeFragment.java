@@ -1,7 +1,10 @@
 package sk.jmurin.android.testy.fragments;
 
+import android.content.AsyncQueryHandler;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -15,68 +18,50 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.File;
-import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import sk.jmurin.android.testy.App;
+import sk.jmurin.android.testy.content.DataContract;
+import sk.jmurin.android.testy.content.Defaults;
 import sk.jmurin.android.testy.entities.Parser;
+import sk.jmurin.android.testy.entities.QuestionData;
 import sk.jmurin.android.testy.gui.MainActivity;
 import sk.jmurin.android.testy.R;
 import sk.jmurin.android.testy.entities.Test;
 
 public class HomeFragment extends Fragment {
 
-    //    private static final String ARG_PARAM1 = "param1";
-//    private static final String ARG_PARAM2 = "param2";
     public static final String TAG = HomeFragment.class.getSimpleName();
     public static final int DRAWER_POS = 0;
+    public static final String TESTYMAPA = "testymapa";
     // private final OkHttpClient client = new OkHttpClient();
     private Map<Integer, Test> testy;
 
-//    private String mParam1;
-//    private String mParam2;
-
-    //  private OnFragmentInteractionListener mListener;
     private TextView statusTextView;
     //private Button downloadOkhttpBtn;
     private RecyclerView rv;
-    // private boolean mIsLargeLayout;
 
-    public HomeFragment() {
-        // Required empty public constructor
+    public static Fragment newInstance(Map<Integer, Test> testy) {
+        HomeFragment fragment = new HomeFragment();
+        Bundle args = new Bundle();
+        args.putSerializable(TESTYMAPA, (Serializable) testy);
+        fragment.setArguments(args);
+        return fragment;
     }
-//
-//    /**
-//     * Use this factory method to create a new instance of
-//     * this fragment using the provided parameters.
-//     *
-//     * @param param1 Parameter 1.
-//     * @param param2 Parameter 2.
-//     * @return A new instance of fragment HomeFragment.
-//     */
-//    public static HomeFragment newInstance(String param1, String param2) {
-//        HomeFragment fragment = new HomeFragment();
-//        Bundle args = new Bundle();
-//        args.putString(ARG_PARAM1, param1);
-//        args.putString(ARG_PARAM2, param2);
-//        fragment.setArguments(args);
-//        return fragment;
-//    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getActivity().setTitle("Testy");
-//        if (getArguments() != null) {
-//            mParam1 = getArguments().getString(ARG_PARAM1);
-//            mParam2 = getArguments().getString(ARG_PARAM2);
-//        }
-        //  mIsLargeLayout = getResources().getBoolean(R.bool.large_layout);
+        Bundle args = getArguments();
+        if (args != null) {
+            testy = (Map<Integer, Test>) args.getSerializable(TESTYMAPA);
+        } else {
+            throw new RuntimeException("Home fragment without arguments!!!");
+        }
     }
 
     @Override
@@ -87,6 +72,8 @@ public class HomeFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        //Log.d(TAG, "onViewCreated(view, savedInstanceState);");
+        App.zaloguj(App.DEBUG, TAG, "onViewCreated(view, savedInstanceState);");
         statusTextView = (TextView) view.findViewById(R.id.statusTextView);
         statusTextView.setText("Aktívne testy");
 //        downloadOkhttpBtn = (Button) view.findViewById(R.id.downloadButton);
@@ -102,50 +89,190 @@ public class HomeFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        // v tejto DEMO verzii budu testy napevno dane v assetoch,
-        // v buducnosti sa spravi stahovanie testov z rest servera ak sa aplikacia osvedci
-
-        SharedPreferences sharedPref = getActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        boolean assetsTestsInitialized = sharedPref.getBoolean(getString(R.string.assets_tests_initialized_preference_key), false);
-        if (!assetsTestsInitialized) {
-            initTestsFromAssets();
-        } else {
-            loadTestsFiles();
-        }
-
-    }
-
-    private void initTestsFromAssets() {
-        Log.d(TAG, "initializujem testy z assetov");
-        // nacitame z assetov testy a ulozime ich do internal app storage, vygenerujeme statistiky v DB pre nacitane testy
-        testy = Parser.initTestsFromAssetsGetTests(getActivity());
-
-        Log.d(TAG, "nacitanych testov: " + testy.size());
-        refreshRecyclerView();
-        SharedPreferences sharedPref = getActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putBoolean(getString(R.string.assets_tests_initialized_preference_key), true);
-        boolean commit = editor.commit();
-        Log.d(TAG, "ulozenie assetsTestsInitialized=" + commit);
-    }
-
-    private synchronized void loadTestsFiles() {
-        Log.d(TAG, "loadujem testy z app dir");
-        testy = Parser.loadTests(getActivity());
-        Log.d(TAG, "nacitanych testov: " + testy.size());
-        refreshRecyclerView();
+        //Log.d(TAG, "onActivityCreated(savedInstanceState);");
+        App.zaloguj(App.DEBUG, TAG, "onActivityCreated(savedInstanceState);");
     }
 
     private void refreshRecyclerView() {
-        Log.d(TAG, "refreshRecyclerView()");
-
+        //Log.d(TAG, "refreshRecyclerView()");
+        App.zaloguj(App.DEBUG, TAG, "refreshRecyclerView()");
         rv.setLayoutManager(new LinearLayoutManager(rv.getContext()));
         rv.setAdapter(new SimpleStringRecyclerViewAdapter(getActivity(), testy));
-        Log.d(TAG, "tests list and stats updated");
+        //Log.d(TAG, "tests list and stats updated");
+        App.zaloguj(App.DEBUG, TAG, "tests list and stats updated");
     }
 
 
-//    private void onDownloadOkhttpClicked() {
+    // TODO: refreshovat statistiky k otazkam pri onStart alebo onResume?
+    @Override
+    public void onStart() {
+        super.onStart();
+        //EventBus.getDefault().register(this);
+        //Log.d(TAG, "onStart");
+        App.zaloguj(App.DEBUG, TAG, "onStart");
+
+        // refresh data z databazy
+        Uri uri = DataContract.QuestionStats.CONTENT_URI
+                .buildUpon()
+                .build();
+
+        AsyncQueryHandler queryHandler = new AsyncQueryHandler(getActivity().getContentResolver()) {
+
+            @Override
+            protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+                super.onQueryComplete(token, cookie, cursor);
+                //Log.d(TAG, "onQueryComplete token=" + token);
+                App.zaloguj(App.DEBUG, TAG, "onQueryComplete token=" + token);
+                List<QuestionData> data = new ArrayList<>();
+                while (cursor.moveToNext()) {
+                    int stat = cursor.getInt(cursor.getColumnIndex(DataContract.QuestionStats.STAT));
+                    int db_id = cursor.getInt(cursor.getColumnIndex(DataContract.QuestionStats._ID));
+                    int test_question_index = cursor.getInt(cursor.getColumnIndex(DataContract.QuestionStats.TEST_QUESTION_INDEX));
+                    int test_id = cursor.getInt(cursor.getColumnIndex(DataContract.QuestionStats.TEST_ID));
+                    data.add(new QuestionData(stat, db_id, test_question_index, test_id));
+                }
+                cursor.close();
+
+                for (QuestionData dd : data) {
+                    try {
+                        testy.get(dd.test_id).getQuestions().get(dd.test_question_index).setStat(dd.stat);
+                        // testy.get(dd.test_id).getQuestions().get(dd.test_question_index).setDbID(dd.db_id);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                refreshRecyclerView();
+            }
+        };
+        queryHandler.startQuery(2, Defaults.NO_COOKIE, uri, null, null, Defaults.NO_SELECTION_ARGS, DataContract.QuestionStats._ID);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        //EventBus.getDefault().unregister(this);
+    }
+
+
+    public static class SimpleStringRecyclerViewAdapter extends RecyclerView.Adapter<SimpleStringRecyclerViewAdapter.ViewHolder> {
+
+        private final TypedValue mTypedValue = new TypedValue();
+        private final MainActivity context;
+        private final Map<Integer, Test> tests;
+        private final String[][] listItemValues;
+        private final int[] testIDs;
+        private int mBackground;
+
+        public SimpleStringRecyclerViewAdapter(Context context, Map<Integer, Test> jsonTests) {
+            context.getTheme().resolveAttribute(R.attr.selectableItemBackground, mTypedValue, true);
+            this.context = (MainActivity) context;
+            mBackground = mTypedValue.resourceId;
+            this.tests = jsonTests;
+            listItemValues = new String[jsonTests.size()][2];
+            testIDs = new int[jsonTests.size()];
+            int i = 0;
+            for (Integer testID : jsonTests.keySet()) {
+                Test t = jsonTests.get(testID);
+                listItemValues[i][0] = t.getName();
+                listItemValues[i][1] = t.getSkorePercento() + " %";
+                testIDs[i] = testID;
+                i++;
+            }
+        }
+
+        public static class ViewHolder extends RecyclerView.ViewHolder {
+//            public String mBoundString;
+
+            public final View mView;
+            public final TextView testNameTextView;
+            public final TextView scoreTextView;
+            private final TextView numberTextView;
+
+            public ViewHolder(View view) {
+                super(view);
+                mView = view;
+                numberTextView = (TextView) view.findViewById(R.id.numberTextView);
+                testNameTextView = (TextView) view.findViewById(R.id.testNameTextView);
+                scoreTextView = (TextView) view.findViewById(R.id.scoreTextView);
+            }
+
+            @Override
+            public String toString() {
+                return super.toString() + " '" + scoreTextView.getText();
+            }
+        }
+
+        public String getValueAt(int position) {
+            return listItemValues[position][0];
+        }
+
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item, parent, false);
+            view.setBackgroundResource(mBackground);
+            return new ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(final ViewHolder holder, final int position) {
+            //holder.mBoundString = mValues.get(position);
+            holder.numberTextView.setText((position + 1) + ".");
+            holder.testNameTextView.setText(listItemValues[position][0]);
+            holder.scoreTextView.setText(listItemValues[position][1]);
+//            holder.scoreTextView.setTypeface(tf);
+
+            holder.mView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //Log.d(TAG, "start test activity");
+                    App.zaloguj(App.DEBUG, TAG, "start test activity");
+                    FragmentManager fragmentManager = context.getSupportFragmentManager();
+                    Test test = tests.get(testIDs[position]);
+                    TestParametersDialogFragment newFragment = TestParametersDialogFragment.newInstance(test);
+                    newFragment.show(fragmentManager, TestParametersDialogFragment.TAG);
+
+                }
+            });
+
+        }
+
+        @Override
+        public int getItemCount() {
+            return listItemValues.length;
+        }
+    }
+
+    //    @Subscribe(threadMode = ThreadMode.MAIN)
+//    public void onDownloadEvent(final EventBusEvents.NewTestsDownloaded newTestsDownloaded) {
+//        Log.d(TAG, "onDownloadEvent: newTestsDownloaded");
+//        loadTestsFiles();
+//    }
+//
+//    @Subscribe(threadMode = ThreadMode.MAIN)
+//    public void onDownloadEvent(final EventBusEvents.NothingToDownload noDownloadEvent) {
+//        Log.d(TAG, "onDownloadEvent: netreba stahovat nove testy: ");
+//        final TextView textView = new TextView(getActivity());
+//        textView.setText("Všetky testy sú aktuálne.");
+//        textView.setTextColor(Color.BLACK);
+//        textView.setPadding(10, 10, 10, 10);
+//        new AlertDialog.Builder(getActivity())
+//                .setView(textView)
+//                .setPositiveButton("OK", null)
+//                .show();
+//    }
+//
+//    @Subscribe(threadMode = ThreadMode.MAIN)
+//    public void onDownloadEvent(EventBusEvents.NewTestsToDownload noveTestyDownloadEvent) {
+//        Log.d(TAG, "onDownloadEvent: treba stiahnut tieto testy: " + noveTestyDownloadEvent.nove);
+//        List<Integer> ids = new ArrayList<>();
+//        for (TestInformation ti : noveTestyDownloadEvent.nove) {
+//            ids.add(ti.id);
+//        }
+//        DialogFragment dialog = ProgressDialogFragment.newInstance(ids, jsonTests.size());
+//        dialog.show(getActivity().getSupportFragmentManager(), ProgressDialogFragment.TAG);
+//    }
+
+    //    private void onDownloadOkhttpClicked() {
 //        if (!NetworkUtils.isConnected(getActivity())) {
 //            //Toast.makeText(this, "Pripojte sa na internet a zopakujte operáciu.", Toast.LENGTH_SHORT).show();
 //            final TextView textView = new TextView(getActivity());
@@ -210,175 +337,6 @@ public class HomeFragment extends Fragment {
 //        });
 //    }
 
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-//        if (context instanceof OnFragmentInteractionListener) {
-//            mListener = (OnFragmentInteractionListener) context;
-//        } else {
-//            throw new RuntimeException(context.toString()
-//                    + " must implement OnFragmentInteractionListener");
-//        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        //mListener = null;
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-//    public interface OnFragmentInteractionListener {
-//        // TODO: Update argument type and name
-//        void onFragmentInteraction(Uri uri);
-//    }
-    @Override
-    public void onStart() {
-        super.onStart();
-        //EventBus.getDefault().register(this);
-        refreshRecyclerView();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        //EventBus.getDefault().unregister(this);
-    }
-
-//    @Subscribe(threadMode = ThreadMode.MAIN)
-//    public void onDownloadEvent(final EventBusEvents.NewTestsDownloaded newTestsDownloaded) {
-//        Log.d(TAG, "onDownloadEvent: newTestsDownloaded");
-//        loadTestsFiles();
-//    }
-//
-//    @Subscribe(threadMode = ThreadMode.MAIN)
-//    public void onDownloadEvent(final EventBusEvents.NothingToDownload noDownloadEvent) {
-//        Log.d(TAG, "onDownloadEvent: netreba stahovat nove testy: ");
-//        final TextView textView = new TextView(getActivity());
-//        textView.setText("Všetky testy sú aktuálne.");
-//        textView.setTextColor(Color.BLACK);
-//        textView.setPadding(10, 10, 10, 10);
-//        new AlertDialog.Builder(getActivity())
-//                .setView(textView)
-//                .setPositiveButton("OK", null)
-//                .show();
-//    }
-//
-//    @Subscribe(threadMode = ThreadMode.MAIN)
-//    public void onDownloadEvent(EventBusEvents.NewTestsToDownload noveTestyDownloadEvent) {
-//        Log.d(TAG, "onDownloadEvent: treba stiahnut tieto testy: " + noveTestyDownloadEvent.nove);
-//        List<Integer> ids = new ArrayList<>();
-//        for (TestInformation ti : noveTestyDownloadEvent.nove) {
-//            ids.add(ti.id);
-//        }
-//        DialogFragment dialog = ProgressDialogFragment.newInstance(ids, jsonTests.size());
-//        dialog.show(getActivity().getSupportFragmentManager(), ProgressDialogFragment.TAG);
-//    }
-
-
-    public static class SimpleStringRecyclerViewAdapter extends RecyclerView.Adapter<SimpleStringRecyclerViewAdapter.ViewHolder> {
-
-        private final TypedValue mTypedValue = new TypedValue();
-        private final MainActivity context;
-        private final Map<Integer, Test> tests;
-        private final String[][] vals;
-        private final int[] ids;
-        private int mBackground;
-
-        public SimpleStringRecyclerViewAdapter(Context context, Map<Integer, Test> jsonTests) {
-            context.getTheme().resolveAttribute(R.attr.selectableItemBackground, mTypedValue, true);
-            this.context = (MainActivity) context;
-            mBackground = mTypedValue.resourceId;
-            this.tests = jsonTests;
-            vals = new String[jsonTests.size()][2];
-            ids = new int[jsonTests.size()];
-            int i = 0;
-            for (Integer testID : jsonTests.keySet()) {
-                Test t = jsonTests.get(testID);
-                vals[i][0] = t.getName();
-                vals[i][1] = t.getSkorePercento() + " %";
-                ids[i] = jsonTests.get(testID).getId();
-                i++;
-            }
-        }
-
-        public static class ViewHolder extends RecyclerView.ViewHolder {
-//            public String mBoundString;
-
-            public final View mView;
-            public final TextView testNameTextView;
-            public final TextView scoreTextView;
-            private final TextView numberTextView;
-
-            public ViewHolder(View view) {
-                super(view);
-                mView = view;
-                numberTextView = (TextView) view.findViewById(R.id.numberTextView);
-                testNameTextView = (TextView) view.findViewById(R.id.testNameTextView);
-                scoreTextView = (TextView) view.findViewById(R.id.scoreTextView);
-            }
-
-            @Override
-            public String toString() {
-                return super.toString() + " '" + scoreTextView.getText();
-            }
-        }
-
-        public String getValueAt(int position) {
-            return vals[position][0];
-        }
-
-//        public SimpleStringRecyclerViewAdapter(Context context, String[][] items) {
-//            context.getTheme().resolveAttribute(R.attr.selectableItemBackground, mTypedValue, true);
-//            this.context = (MainActivity) context;
-//            mBackground = mTypedValue.resourceId;
-//            mValues = items;
-//        }
-
-        @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item, parent, false);
-            view.setBackgroundResource(mBackground);
-            return new ViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(final ViewHolder holder, final int position) {
-            //holder.mBoundString = mValues.get(position);
-            holder.numberTextView.setText((position + 1) + ".");
-            holder.testNameTextView.setText(vals[position][0]);
-            holder.scoreTextView.setText(vals[position][1]);
-//            holder.scoreTextView.setTypeface(tf);
-
-            holder.mView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.d(TAG, "start test activity");
-                    FragmentManager fragmentManager = context.getSupportFragmentManager();
-                    Test test = tests.get(ids[position]);
-                    TestParametersDialogFragment newFragment = TestParametersDialogFragment.newInstance(test);
-                    newFragment.show(fragmentManager, TestParametersDialogFragment.TAG);
-
-                }
-            });
-
-        }
-
-        @Override
-        public int getItemCount() {
-            return vals.length;
-        }
-    }
 
 //    private void startDialogFragment(){
 //        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();

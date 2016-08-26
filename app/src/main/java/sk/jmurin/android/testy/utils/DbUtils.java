@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import sk.jmurin.android.testy.App;
+
 /**
  * Useful Database methods and classes.
  * TODO: add REAL and BLOB data types when creating DB
@@ -111,7 +113,8 @@ public final class DbUtils {
             }
             ddl.append(")");
             String ddlString = ddl.toString();
-            Log.d(TAG, ddlString);
+            //Log.d(TAG, ddlString);
+            App.zaloguj(App.DEBUG, TAG,ddlString);
             return ddlString;
         }
 

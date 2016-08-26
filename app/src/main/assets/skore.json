@@ -1,0 +1,30 @@
+[
+  {
+    "username": "janik",
+    "deviceID": " ffffffff-fce1-1976-f244-72c05ad2d24c",
+    "testID",
+    " 2",
+    "skore": " 96"
+  },
+  {
+    "username": "janik",
+    "deviceID": " ffffffff-fce1-1976-f244-72c05ad2d24c",
+    "testID",
+    " 1",
+    "skore": " 55"
+  },
+  {
+    "username": "simonka",
+    "deviceID": " ffffffff-890b-bb1b-ffff-ffff99d603a9",
+    "testID",
+    " 2",
+    "skore": " 36"
+  },
+  {
+    "username": "simonka",
+    "deviceID": " ffffffff-890b-bb1b-ffff-ffff99d603a9",
+    "testID",
+    " 1",
+    "skore": " 61"
+  }
+]

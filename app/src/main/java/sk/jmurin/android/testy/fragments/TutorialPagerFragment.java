@@ -102,7 +102,8 @@ public class TutorialPagerFragment extends Fragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventBusEvent(EventBusEvents.DalejButtonClicked event) {
-        Log.d(TAG, "onEventBusEvent: DalejButtonClicked");
+        //Log.d(TAG, "onEventBusEvent: DalejButtonClicked");
+        App.zaloguj(App.DEBUG,TAG,"onEventBusEvent: DalejButtonClicked");
         switch (mPager.getCurrentItem()) {
             case 0:
                 mPager.setCurrentItem(1);
@@ -118,13 +119,14 @@ public class TutorialPagerFragment extends Fragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventBusEvent(EventBusEvents.ZavrietTutorial zavriet) {
-        Log.d(TAG, "onEventBusEvent(EventBusEvents.ZavrietTutorial zavriet)");
+        //Log.d(TAG, "onEventBusEvent(EventBusEvents.ZavrietTutorial zavriet)");
+        App.zaloguj(App.DEBUG,TAG,"onEventBusEvent(EventBusEvents.ZavrietTutorial zavriet)");
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventBusEvent(EventBusEvents.UsernameSelected usernameEvent) {
-        Log.d(TAG, "onEventBusEvent: UsernameSelected " + usernameEvent.meno);
-
+        //Log.d(TAG, "onEventBusEvent: UsernameSelected " + usernameEvent.meno);
+        App.zaloguj(App.DEBUG,TAG,"onEventBusEvent: UsernameSelected " + usernameEvent.meno);
     }
 
 

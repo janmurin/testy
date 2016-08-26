@@ -23,6 +23,7 @@ import junit.framework.Assert;
 
 import java.util.List;
 
+import sk.jmurin.android.testy.App;
 import sk.jmurin.android.testy.R;
 import sk.jmurin.android.testy.content.DataContract;
 import sk.jmurin.android.testy.content.Defaults;
@@ -84,7 +85,8 @@ public class QuestionActivity extends AppCompatActivity {
     }
 
     private void loadAktualnaOtazka() {
-        System.out.println("loadAktualnaOtazka: ziskavam otazku s id: " + instanciaTestu.idckaUloh[instanciaTestu.aktUlohaIdx][0]);
+        //System.out.println("loadAktualnaOtazka: ziskavam otazku s id: " + instanciaTestu.idckaUloh[instanciaTestu.aktUlohaIdx][0]);
+        App.zaloguj(App.DEBUG, TAG,"loadAktualnaOtazka: ziskavam otazku s id: " + instanciaTestu.idckaUloh[instanciaTestu.aktUlohaIdx][0]);
         aktualnaOtazka = getOtazkaPodlaID(instanciaTestu.idckaUloh[instanciaTestu.aktUlohaIdx][0]);
         setTitle(instanciaTestu.test.getName() + " " + (instanciaTestu.aktUlohaIdx + 1) + "/" + instanciaTestu.idckaUloh.length);
         refreshOtazkaLabels();
@@ -96,7 +98,8 @@ public class QuestionActivity extends AppCompatActivity {
     }
 
     private void refreshOtazkaLabels() {
-        Log.d(TAG, "refreshOtazkaLabels");
+//        Log.d(TAG, "refreshOtazkaLabels");
+        App.zaloguj(App.DEBUG, TAG,"refreshOtazkaLabels");
         otazkaTextView.setText(aktualnaOtazka.getQuestion());
 
         odpovedeListViewAdapter = new OdpovedeListViewAdapter(this, R.layout.answer_list_item, aktualnaOtazka.getAnswers(), instanciaTestu.odpovedeOrder[instanciaTestu.aktUlohaIdx]);
@@ -107,9 +110,11 @@ public class QuestionActivity extends AppCompatActivity {
         odpovedeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.d(TAG, "odpoved pos: " + position + " clicked");
+                //Log.d(TAG, "odpoved pos: " + position + " clicked");
+                App.zaloguj(App.DEBUG, TAG,"odpoved pos: " + position + " clicked");
                 if (!odpovedeListViewClickable) {
-                    Log.d(TAG, "odpovedeListView currently not clickable");
+                    //Log.d(TAG, "odpovedeListView currently not clickable");
+                    App.zaloguj(App.DEBUG, TAG,"odpovedeListView currently not clickable");
                     return;
                 }
                 instanciaTestu.zaskrtnute[instanciaTestu.aktUlohaIdx][position] = 1 - instanciaTestu.zaskrtnute[instanciaTestu.aktUlohaIdx][position];
@@ -120,11 +125,13 @@ public class QuestionActivity extends AppCompatActivity {
                 }
             }
         });
-        Log.d(TAG, "Otazka: " + (instanciaTestu.aktUlohaIdx + 1) + "/" + instanciaTestu.idckaUloh.length);
+        //Log.d(TAG, "Otazka: " + (instanciaTestu.aktUlohaIdx + 1) + "/" + instanciaTestu.idckaUloh.length);
+        App.zaloguj(App.DEBUG, TAG,"Otazka: " + (instanciaTestu.aktUlohaIdx + 1) + "/" + instanciaTestu.idckaUloh.length);
     }
 
     public void dalejButtonActionPerformed(View view) {
-        System.out.println("dalejButtonActionPerformed");
+        //System.out.println("dalejButtonActionPerformed");
+        App.zaloguj(App.DEBUG, TAG,"dalejButtonActionPerformed");
         // ak je otazka uz ohodnotena, tak sa rovno vykreslia spravne odpovede
         if (instanciaTestu.ohodnotene[instanciaTestu.aktUlohaIdx]) {
             instanciaTestu.aktUlohaIdx++;
@@ -150,7 +157,8 @@ public class QuestionActivity extends AppCompatActivity {
             if (uspesne) {
                 instanciaTestu.uspesnych++;
             }
-            System.out.println("uspesna odpoved= " + uspesne);
+            //System.out.println("uspesna odpoved= " + uspesne);
+            App.zaloguj(App.DEBUG, TAG,"uspesna odpoved= " + uspesne);
             instanciaTestu.ohodnotene[instanciaTestu.aktUlohaIdx] = true;
             updateStatistika(uspesne);
         }
@@ -161,7 +169,8 @@ public class QuestionActivity extends AppCompatActivity {
     }
 
     private void zobrazStatistikaActivity() {
-        System.out.println("zobrazStatistikaActivity");
+        //System.out.println("zobrazStatistikaActivity");
+        App.zaloguj(App.DEBUG, TAG,"zobrazStatistikaActivity");
         FragmentManager fragmentManager = getSupportFragmentManager();
         StatistikaDialogFragment newFragment = StatistikaDialogFragment.newInstance(instanciaTestu);
         newFragment.show(fragmentManager, StatistikaDialogFragment.TAG);
@@ -169,7 +178,8 @@ public class QuestionActivity extends AppCompatActivity {
 
 
     public void predButtonActionPerformed(View view) {
-        System.out.println("predButtonActionPerformed");
+        //System.out.println("predButtonActionPerformed");
+        App.zaloguj(App.DEBUG, TAG,"predButtonActionPerformed");
         instanciaTestu.aktUlohaIdx--;
         if (instanciaTestu.aktUlohaIdx < 0) {
             // iba ak sme v uciacom mode mozeme prechadzat takto
@@ -199,21 +209,22 @@ public class QuestionActivity extends AppCompatActivity {
         } else {
             if (uspesne) {
                 // bolo -1 a uhadli sme, tak davame hned na 1
-                System.out.println("bolo -1 a uhadli sme, tak davame hned na 1");
+                //System.out.println("bolo -1 a uhadli sme, tak davame hned na 1");
+                App.zaloguj(App.DEBUG, TAG,"bolo -1 a uhadli sme, tak davame hned na 1");
                 instanciaTestu.idckaUloh[instanciaTestu.aktUlohaIdx][2] = 1;     // zapisujeme do aktualneho stavu
             } else {
                 // nie sme uspesni takze do aktualneho stavu musime zapisat -1
                 instanciaTestu.idckaUloh[instanciaTestu.aktUlohaIdx][2] = -1;
             }
         }
-        for (int i = 0; i < instanciaTestu.idckaUloh.length; i++) {
-            System.out.print(String.format("%3s", Integer.toString(instanciaTestu.idckaUloh[i][1])));
-        }
-        System.out.println();
-        for (int i = 0; i < instanciaTestu.idckaUloh.length; i++) {
-            System.out.print(String.format("%3s", Integer.toString(instanciaTestu.idckaUloh[i][2])));
-        }
-        System.out.println();
+//        for (int i = 0; i < instanciaTestu.idckaUloh.length; i++) {
+//            System.out.print(String.format("%3s", Integer.toString(instanciaTestu.idckaUloh[i][1])));
+//        }
+//        System.out.println();
+//        for (int i = 0; i < instanciaTestu.idckaUloh.length; i++) {
+//            System.out.print(String.format("%3s", Integer.toString(instanciaTestu.idckaUloh[i][2])));
+//        }
+//        System.out.println();
 
 //        // updatneme statistiku
         final int novyStat = instanciaTestu.idckaUloh[instanciaTestu.aktUlohaIdx][2];
@@ -227,30 +238,33 @@ public class QuestionActivity extends AppCompatActivity {
                 .build();
         ContentValues values = new ContentValues();
         values.put(DataContract.QuestionStats.STAT, novyStat);
-        System.out.println("updating db with " + novyStat + " for id " + db_id);
+        //System.out.println("updating db with " + novyStat + " for id " + db_id);
+        App.zaloguj(App.DEBUG, TAG,"updating db with " + novyStat + " for id " + db_id);
 
         AsyncQueryHandler updateHandler = new AsyncQueryHandler(getContentResolver()) {
             @Override
             protected void onUpdateComplete(int token, Object cookie, int result) {
                 super.onUpdateComplete(token, cookie, result);
-                Log.d(TAG, "onUpdateComplete token: " + token + " result: " + result);
+                //Log.d(TAG, "onUpdateComplete token: " + token + " result: " + result);
+                App.zaloguj(App.DEBUG, TAG,"onUpdateComplete token: " + token + " result: " + result);
             }
 
             @Override
             protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
                 super.onQueryComplete(token, cookie, cursor);
-                Log.d(TAG, "onQueryComplete token=" + token);
+//                Log.d(TAG, "onQueryComplete token=" + token);
+                App.zaloguj(App.DEBUG, TAG,"onQueryComplete token=" + token);
                 if (cursor.moveToNext()) {
                     int stat = cursor.getInt(cursor.getColumnIndex(DataContract.QuestionStats.STAT));
                     int db_id2 = cursor.getInt(cursor.getColumnIndex(DataContract.QuestionStats._ID));
                     int question_test_id = cursor.getInt(cursor.getColumnIndex(DataContract.QuestionStats.TEST_QUESTION_INDEX));
 //                    String test_name = cursor.getString(cursor.getColumnIndex(DataContract.QuestionStats.TEST_NAME));
                     int test_id = cursor.getInt(cursor.getColumnIndex(DataContract.QuestionStats.TEST_ID));
-                    System.out.println("stat=" + stat);
-                    System.out.println("db_id=" + db_id2);
-                    System.out.println("question_test_id=" + question_test_id);
-                    System.out.println("test_id=" + test_id);
-                    // check ze vlozilo to do DB tam kde to malo to co malo
+//                    System.out.println("stat=" + stat);
+//                    System.out.println("db_id=" + db_id2);
+//                    System.out.println("question_test_id=" + question_test_id);
+//                    System.out.println("test_id=" + test_id);
+//                    // check ze vlozilo to do DB tam kde to malo to co malo
                     Assert.assertTrue(novyStat == stat && db_id2 == db_id);
                 } else {
                     // musi vzdy najst to co updatlo predtym
@@ -269,7 +283,8 @@ public class QuestionActivity extends AppCompatActivity {
     }
 
     private boolean skontrolujOdpovedeAVykresli() {
-        System.out.println("skontrolujOdpovedeAVykresli");
+        //System.out.println("skontrolujOdpovedeAVykresli");
+        App.zaloguj(App.DEBUG, TAG,"skontrolujOdpovedeAVykresli");
         int nespravnaOdpovedFarba = Color.RED;
         int spravnaOdpovedFarba = Color.GREEN;
         int spravnaNeoznacenaFarba = Color.MAGENTA;
@@ -309,7 +324,8 @@ public class QuestionActivity extends AppCompatActivity {
                 }
             }
         }
-        System.out.println("skontrolujOdpovedeAVykresli: minus bodov " + instanciaTestu.pocetMinusBodov);
+        //System.out.println("skontrolujOdpovedeAVykresli: minus bodov " + instanciaTestu.pocetMinusBodov);
+        App.zaloguj(App.DEBUG, TAG,"skontrolujOdpovedeAVykresli: minus bodov " + instanciaTestu.pocetMinusBodov);
         //System.out.println();
         setClickableOdpovede(false);
         return uspesne;

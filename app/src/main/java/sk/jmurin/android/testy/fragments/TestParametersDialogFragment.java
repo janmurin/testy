@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import sk.jmurin.android.testy.App;
 import sk.jmurin.android.testy.gui.InstanciaTestu;
 import sk.jmurin.android.testy.gui.QuestionActivity;
 import sk.jmurin.android.testy.R;
@@ -200,7 +201,8 @@ public class TestParametersDialogFragment extends DialogFragment {
                 max = pom;
             }
         }
-        System.out.println("vybrane hodnoty min: " + min + " max: " + max);
+        //System.out.println("vybrane hodnoty min: " + min + " max: " + max);
+        App.zaloguj(App.DEBUG,TAG,"vybrane hodnoty min: " + min + " max: " + max);
         vybrane = new ArrayList<>();
         for (int i = min - 1; i < max; i++) { // 1..10 == 0..9 v liste
             int stat = test.getQuestions().get(i).getStat(); // otazky v teste su v rovnakom poradi ako v teststats
@@ -215,7 +217,8 @@ public class TestParametersDialogFragment extends DialogFragment {
         zltaCheckBox.setText("+" + mapa.get(1));
         oranzovaCheckBox.setText("+" + mapa.get(2));
         zelenaCheckBox.setText("+" + mapa.get(3));
-        System.out.println("vybranych otazok celkom: " + vybrane.size());
+        //System.out.println("vybranych otazok celkom: " + vybrane.size());
+        App.zaloguj(App.DEBUG,TAG,"vybranych otazok celkom: " + vybrane.size());
         sumarTextView.setText("Vybraných otázok celkom: " + vybrane.size());
     }
 
@@ -252,17 +255,14 @@ public class TestParametersDialogFragment extends DialogFragment {
         ArrayAdapter<Integer> minSpinnerAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, spinnerVals);
         minSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         minSpinner.setAdapter(minSpinnerAdapter);
-        System.out.println("adapter set: " + spinnerVals);
         minSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                System.out.println("vybrana min hodnota: [" + minSpinner.getSelectedItem() + "]");
                 odfiltrujOtazky();
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                System.out.println("Spinner: nothing selected");
             }
         });
         minSpinner.setSelection(0);
@@ -273,13 +273,11 @@ public class TestParametersDialogFragment extends DialogFragment {
         maxSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                System.out.println("vybrana max hodnota: [" + maxSpinner.getSelectedItem() + "]");
                 odfiltrujOtazky();
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                System.out.println("Spinner: nothing selected");
             }
         });
         maxSpinner.setSelection(spinnerVals.size() - 1);
