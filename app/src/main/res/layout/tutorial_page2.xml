@@ -18,12 +18,12 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Každá otázka je ohodnotená od 1 po 5 hviezdičiek podľa nasledovného pravidla:
-*		žiadna správna odpoveď
-**		ešte neriešená otázka
-***		jedna správna odpoveď
-****	dve správne odpovede
-*****	aspoň tri správne odpovede" />
+            android:text="Každá otázka je ohodnotená od 1 do 5 hviezdičiek podľa toho, koľkokrát bola zaznemananá správna odpoveď.\n\n
+*          žiadna správna odpoveď\n
+**        ešte neriešená otázka\n
+***      jedna správna odpoveď\n
+****    dve správne odpovede\n
+*****  aspoň tri správne odpovede" />
 
         <TextView
             style="@style/TextAppearance.AppCompat.Headline"
@@ -34,10 +34,9 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Po označení odpovede na otázku a jej vyhodnotení sa odpovede zafarbia nasledovne:
-
-červená- označená nesprávna odpoveď
-zelená- označená správna odpoveď
+            android:text="Po označení odpovede na otázku a jej vyhodnotení sa odpovede zafarbia nasledovne:\n\n
+červená- označená nesprávna odpoveď\n
+zelená- označená správna odpoveď\n
 ružová- správna odpoveď, ktorá nie je označená" />
 
     </LinearLayout>

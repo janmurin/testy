@@ -13,6 +13,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
@@ -80,8 +82,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else {
             displayHome();
         }
-
     }
+
 
     private boolean isUsernameRegistered() {
         return !App.USERNAME.equals(App.DEFAULT_USERNAME);
@@ -232,6 +234,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //Log.d(TAG, "onEventBusEvent: UsernameSelected " + usernameEvent.meno);
         App.zaloguj(App.DEBUG, TAG, "onEventBusEvent: UsernameSelected " + usernameEvent.meno);
         displayHome();
+        nastavMeno(usernameEvent.meno);
+    }
+
+    public void nastavMeno(String name) {
+//        TextView menoTextView = (TextView) findViewById(R.id.menoTextView);
+//        menoTextView.setText(name);
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        View hView = navigationView.getHeaderView(0);
+        TextView nav_user = (TextView) hView.findViewById(R.id.menoTextView);
+        nav_user.setText("Meno: "+name);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -261,6 +274,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         App.DEVICE_ID = sharedPref.getString(getString(R.string.device_id_preference_key), null);
         //Log.d(TAG, "nacitane username a uuid: " + App.USERNAME + " " + App.DEVICE_ID);
         App.zaloguj(App.DEBUG, TAG, "nacitane username a uuid: " + App.USERNAME + " " + App.DEVICE_ID);
+        nastavMeno(App.USERNAME);
     }
 
     //

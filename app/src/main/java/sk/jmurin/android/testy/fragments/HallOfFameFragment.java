@@ -45,6 +45,7 @@ import sk.jmurin.android.testy.entities.SkoreStats;
 import sk.jmurin.android.testy.entities.Test;
 import sk.jmurin.android.testy.gui.MainActivity;
 import sk.jmurin.android.testy.utils.EventBusEvents;
+import sk.jmurin.android.testy.utils.NetworkUtils;
 
 /**
  * Created by jan.murin on 26-Aug-16.
@@ -135,7 +136,7 @@ public class HallOfFameFragment extends Fragment {
         App.zaloguj(App.DEBUG, TAG, "onActivityCreated(savedInstanceState);");
     }
 
-    // TODO: progress dialog a info o offline stave, nerefreshovat zakazdym ked sa vola tato metoda
+    // TODO: progress dialog? a info o offline stave, nerefreshovat zakazdym ked sa vola tato metoda
     // musi byt internet inak sa zobrazi hlaska o nedostupnosti statistik
     @Override
     public void onStart() {
@@ -143,62 +144,67 @@ public class HallOfFameFragment extends Fragment {
         EventBus.getDefault().register(this);
         App.zaloguj(App.DEBUG, TAG, "onStart");
 
-        // refresh statistiku zo servera
-        Request request = new Request.Builder()
-                .url(Secrets.SKORE_STATS_API_URL)
-                .build();
 
-        final OkHttpClient client = new OkHttpClient();
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                App.zaloguj(App.DEBUG, TAG, "onFailure");
-            }
+        if (NetworkUtils.isConnected(getActivity())) {
+            // refresh statistiku zo servera
+            Request request = new Request.Builder()
+                    .url(Secrets.SKORE_STATS_API_URL)
+                    .build();
 
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                App.zaloguj(App.DEBUG, TAG, "onResponse(Call call, Response response)");
-                if (response.isSuccessful()) {
-                    Headers responseHeaders = response.headers();
-                    App.zaloguj(App.DEBUG, TAG, "response.isSuccessful() RESPONSE HEADERS:");
-                    for (int i = 0, size = responseHeaders.size(); i < size; i++) {
-                        //Log.d(TAG, responseHeaders.name(i) + ": " + responseHeaders.value(i));
-                        App.zaloguj(App.DEBUG, TAG, responseHeaders.name(i) + ": " + responseHeaders.value(i));
-                    }
-
-                    String jsonResponse = response.body().string();
-                    App.zaloguj(App.DEBUG, TAG, "server response:" + jsonResponse);
-                    ObjectMapper mapper = new ObjectMapper();
-                    List<SkoreStats> skores;
-                    try {
-                        skores = mapper.readValue(jsonResponse, new TypeReference<List<SkoreStats>>() {
-                        });
-                        App.zaloguj(App.DEBUG, TAG, "nacitane skore stats list: " + skores);
-
-                        // resetneme stare skore staty
-                        for (Integer testID : skoreStatsMap.keySet()) {
-                            skoreStatsMap.put(testID, new ArrayList<SkoreStats>());
-                        }
-                        // server nam poslal vsetky skore staty, teraz ich nahadzeme do nasej mapy
-                        for (SkoreStats ss : skores) {
-                            if (skoreStatsMap.keySet().contains(ss.testID)) {
-                                // tento stat nas zaujima lebo je medzi nasimi aktivnymi testami v mape
-                                skoreStatsMap.get(ss.testID).add(ss);
-                            }
-                        }
-                        // skore staty su rozdelene podla testID a usporiadane tak ako nam ich vyhodil rest server
-                        EventBus.getDefault().post(new EventBusEvents.SkoreStatsDownloaded());
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        EventBus.getDefault().post(new EventBusEvents.DownloadError("Server odpovedal, ale nepodarilo sa nacitat data zo servera."));
-                    }
-
-
-                } else {
-                    EventBus.getDefault().post(new EventBusEvents.DownloadError("Server neodpovedal, data nie su dostupne."));
+            final OkHttpClient client = new OkHttpClient();
+            client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    App.zaloguj(App.DEBUG, TAG, "onFailure");
                 }
-            }
-        });
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    App.zaloguj(App.DEBUG, TAG, "onResponse(Call call, Response response)");
+                    if (response.isSuccessful()) {
+                        Headers responseHeaders = response.headers();
+                        App.zaloguj(App.DEBUG, TAG, "response.isSuccessful() RESPONSE HEADERS:");
+                        for (int i = 0, size = responseHeaders.size(); i < size; i++) {
+                            //Log.d(TAG, responseHeaders.name(i) + ": " + responseHeaders.value(i));
+                            App.zaloguj(App.DEBUG, TAG, responseHeaders.name(i) + ": " + responseHeaders.value(i));
+                        }
+
+                        String jsonResponse = response.body().string();
+                        App.zaloguj(App.DEBUG, TAG, "server response:" + jsonResponse);
+                        ObjectMapper mapper = new ObjectMapper();
+                        List<SkoreStats> skores;
+                        try {
+                            skores = mapper.readValue(jsonResponse, new TypeReference<List<SkoreStats>>() {
+                            });
+                            App.zaloguj(App.DEBUG, TAG, "nacitane skore stats list: " + skores);
+
+                            // resetneme stare skore staty
+                            for (Integer testID : skoreStatsMap.keySet()) {
+                                skoreStatsMap.put(testID, new ArrayList<SkoreStats>());
+                            }
+                            // server nam poslal vsetky skore staty, teraz ich nahadzeme do nasej mapy
+                            for (SkoreStats ss : skores) {
+                                if (skoreStatsMap.keySet().contains(ss.testID)) {
+                                    // tento stat nas zaujima lebo je medzi nasimi aktivnymi testami v mape
+                                    skoreStatsMap.get(ss.testID).add(ss);
+                                }
+                            }
+                            // skore staty su rozdelene podla testID a usporiadane tak ako nam ich vyhodil rest server
+                            EventBus.getDefault().post(new EventBusEvents.SkoreStatsDownloaded());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            EventBus.getDefault().post(new EventBusEvents.DownloadError("Server odpovedal, ale nepodarilo sa nacitat data zo servera."));
+                        }
+
+
+                    } else {
+                        EventBus.getDefault().post(new EventBusEvents.DownloadError("Server neodpovedal, data nie su dostupne."));
+                    }
+                }
+            });
+        } else {
+            Toast.makeText(getActivity(), "Nepodarilo sa pripojiť k internetu. Nie sú dostupné aktuálne dáta.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

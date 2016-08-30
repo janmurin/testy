@@ -16,6 +16,7 @@
         <activity
             android:name=".gui.MainActivity"
             android:label="@string/app_name"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,7 +29,9 @@
             android:name=".content.MyContentProvider"
             android:authorities="sk.jmurin.android.testy" />
 
-        <activity android:name=".gui.QuestionActivity"></activity>
+        <activity
+            android:name=".gui.QuestionActivity"
+            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>

@@ -3,6 +3,7 @@
     android:layout_width="300dp"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:padding="16dp"
     android:scrollbars="vertical">
 
     <TextView
@@ -148,7 +149,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
-                android:text="červené" />
+                android:text="*" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="0 odp." />
 
             <CheckBox
                 android:id="@+id/cervenaCheckBox"
@@ -170,7 +177,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
-                android:text="biele" />
+                android:text="**" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="- odp." />
 
             <CheckBox
                 android:id="@+id/bielaCheckBox"
@@ -192,7 +205,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
-                android:text="žlté" />
+                android:text="***" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="1 odp." />
 
             <CheckBox
                 android:id="@+id/zltaCheckBox"
@@ -215,7 +234,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
-                android:text="oranžové" />
+                android:text="****" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="2 odp." />
 
             <CheckBox
                 android:id="@+id/oranzovaCheckBox"
@@ -237,7 +262,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
-                android:text="zelené" />
+                android:text="*****" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="3+ odp." />
 
             <CheckBox
                 android:id="@+id/zelenaCheckBox"
