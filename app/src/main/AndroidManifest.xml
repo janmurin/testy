@@ -32,6 +32,12 @@
         <activity
             android:name=".gui.QuestionActivity"
             android:screenOrientation="portrait"></activity>
+
+        <receiver android:name=".NetworkStateReceiver">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

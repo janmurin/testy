@@ -1,0 +1,296 @@
+{
+  "name": "Biológia človeka 2",
+  "version": 1,
+  "id":3,
+  "questions": [
+    {
+      "question": "Ktorý orgán môže postihnúť choroba zvaná endometrióza?",
+      "answers": [
+        {
+          "text": "štítnu žľazu",
+          "isCorrect": false
+        },
+        {
+          "text": "maternicu",
+          "isCorrect": true
+        },
+        {
+          "text": "obličky",
+          "isCorrect": false
+        },        {
+          "text": "štítnu žľazu",
+          "isCorrect": false
+        },
+        {
+          "text": "maternicu",
+          "isCorrect": true
+        },
+        {
+          "text": "obličky",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Najväčšia žľaza v ľudskom tele je:",
+      "answers": [
+        {
+          "text": "žalúdok",
+          "isCorrect": false
+        },
+        {
+          "text": "pečeň",
+          "isCorrect": true
+        },
+        {
+          "text": "jazyk",
+          "isCorrect": false
+        },        {
+          "text": "žalúdok",
+          "isCorrect": false
+        },
+        {
+          "text": "pečeň",
+          "isCorrect": true
+        },
+        {
+          "text": "jazyk",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Ako znie latinský názov pre srdce?",
+      "answers": [
+        {
+          "text": "cor",
+          "isCorrect": true
+        },
+        {
+          "text": "card",
+          "isCorrect": false
+        },
+        {
+          "text": "kard",
+          "isCorrect": false
+        },
+        {
+          "text": "cor",
+          "isCorrect": true
+        },
+        {
+          "text": "card",
+          "isCorrect": false
+        },
+        {
+          "text": "kard",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Spojenie medzi stredným uchom a nosohltanom zabezpečuje:",
+      "answers": [
+        {
+          "text": "Cortiho orgán",
+          "isCorrect": false
+        },
+        {
+          "text": "Eustachova trubica",
+          "isCorrect": true
+        },
+        {
+          "text": "bazálna membrána",
+          "isCorrect": false
+        },
+        {
+          "text": "Cortiho orgán",
+          "isCorrect": false
+        },
+        {
+          "text": "Eustachova trubica",
+          "isCorrect": true
+        },
+        {
+          "text": "bazálna membrána",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Kde je tlak krvi najväčší?",
+      "answers": [
+        {
+          "text": "v aorte",
+          "isCorrect": true
+        },
+        {
+          "text": "v mozgu",
+          "isCorrect": false
+        },
+        {
+          "text": "vo vlásočniciach",
+          "isCorrect": false
+        },
+        {
+          "text": "v aorte",
+          "isCorrect": true
+        },
+        {
+          "text": "v mozgu",
+          "isCorrect": false
+        },
+        {
+          "text": "vo vlásočniciach",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Na biochemickom rozklade prijatých látok sa v bunke podieľa:",
+      "answers": [
+        {
+          "text": "endoplazmatické retikulum",
+          "isCorrect": false
+        },
+        {
+          "text": "lyzozómy",
+          "isCorrect": true
+        },
+        {
+          "text": "mitochondrie",
+          "isCorrect": false
+        },
+        {
+          "text": "endoplazmatické retikulum",
+          "isCorrect": false
+        },
+        {
+          "text": "lyzozómy",
+          "isCorrect": true
+        },
+        {
+          "text": "mitochondrie",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Osteocyty sú:",
+      "answers": [
+        {
+          "text": "kostné bunky",
+          "isCorrect": true
+        },
+        {
+          "text": "kožné bunky",
+          "isCorrect": false
+        },
+        {
+          "text": "mozgové bunky",
+          "isCorrect": false
+        },
+        {
+          "text": "kostné bunky",
+          "isCorrect": true
+        },
+        {
+          "text": "kožné bunky",
+          "isCorrect": false
+        },
+        {
+          "text": "mozgové bunky",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Koľko stavcov má chrbtica?",
+      "answers": [
+        {
+          "text": "13 až 14",
+          "isCorrect": false
+        },
+        {
+          "text": "23 až 24",
+          "isCorrect": false
+        },
+        {
+          "text": "33 až 34",
+          "isCorrect": true
+        },
+        {
+          "text": "13 až 14",
+          "isCorrect": false
+        },
+        {
+          "text": "23 až 24",
+          "isCorrect": false
+        },
+        {
+          "text": "33 až 34",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "question": "Z čoho sa skladá pot?",
+      "answers": [
+        {
+          "text": "iba z vody",
+          "isCorrect": false
+        },
+        {
+          "text": "z vody, uhličitanu sodného a iných látok",
+          "isCorrect": false
+        },
+        {
+          "text": "z vody, chloridu sodného a iných látok",
+          "isCorrect": true
+        },
+        {
+          "text": "iba z vody",
+          "isCorrect": false
+        },
+        {
+          "text": "z vody, uhličitanu sodného a iných látok",
+          "isCorrect": false
+        },
+        {
+          "text": "z vody, chloridu sodného a iných látok",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "question": "Tón hlasu vzniká:",
+      "answers": [
+        {
+          "text": "rozkmitaním hlasivkových väzov pri nádychu",
+          "isCorrect": false
+        },
+        {
+          "text": "rozkmitaním hlasivkových väzov pri výdychu",
+          "isCorrect": true
+        },
+        {
+          "text": "pohybom príklopky hrtanovej",
+          "isCorrect": false
+        },
+        {
+          "text": "rozkmitaním hlasivkových väzov pri nádychu",
+          "isCorrect": false
+        },
+        {
+          "text": "rozkmitaním hlasivkových väzov pri výdychu",
+          "isCorrect": true
+        },
+        {
+          "text": "pohybom príklopky hrtanovej",
+          "isCorrect": false
+        }
+      ]
+    }
+  ]
+}
+

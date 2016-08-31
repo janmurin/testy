@@ -24,17 +24,16 @@ public class DataContract {
     public interface Tables {
         String QUESTION_STATS = "question_stats";
         String QUESTION_STAT_ID = "question_stats/#";
+        String STATS_NOT_SENT = "stats_not_sent";
     }
 
     public interface Codes {
-        int QUESTIONS = 100;
-        int QUESTIONS_ID = 101;
+        int QUESTION_STATS = 100;
+        int QUESTIONS_STATS_ID = 101;
+        int STATS_NOT_SENT = 103;
     }
 
-    public interface QuestionColumns extends BaseColumns{
-//        String TEST_NAME = "test_name";
-//        String TEST_VERSION = "test_version";
-
+    public interface QuestionColumns extends BaseColumns {
         String TEST_ID = "test_id";
         String STAT = "stat";
         String TEST_QUESTION_INDEX = "test_question_index";
@@ -45,4 +44,21 @@ public class DataContract {
         public static final Uri CONTENT_URI = Uri.withAppendedPath(AUTHORITY_URI, Tables.QUESTION_STATS);
         public static final String CONTENT_TYPE_ITEM = buildContentTypeItem(Tables.QUESTION_STAT_ID);
     }
+
+    public interface StatsNotSentColumns extends BaseColumns {
+        String USERNAME = "username";
+        String DEVICE_ID = "device_id";
+        String TEST_ID = "test_id";
+        String TEST_VERSION = "test_version";
+        String TIME_CREATED = "time_created";
+        String STATS = "stats";
+        String SKORE = "skore";
+    }
+
+    public static final class StatsNotSent implements StatsNotSentColumns {
+        public static final String CONTENT_TYPE = buildContentTypeDir(Tables.STATS_NOT_SENT);
+        public static final Uri CONTENT_URI = Uri.withAppendedPath(AUTHORITY_URI, Tables.STATS_NOT_SENT);
+        //public static final String CONTENT_TYPE_ITEM = buildContentTypeItem(Tables.QUESTION_STAT_ID);
+    }
+
 }

@@ -103,7 +103,7 @@ public class HomeFragment extends Fragment {
     }
 
 
-    // TODO: refreshovat statistiky k otazkam pri onStart alebo onResume?
+    // TODO: refreshovat statistiky k otazkam pri onStart alebo onResume? pridat progress bar?
     @Override
     public void onStart() {
         super.onStart();

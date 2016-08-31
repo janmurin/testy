@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -160,7 +161,10 @@ public class TestParametersDialogFragment extends DialogFragment {
                 if (vybrane == null) {
                     odfiltrujOtazky();
                 }
-
+                if (vybrane.isEmpty()) {
+                    Toast.makeText(getActivity(), "Zadaným kritériám nevyhovuje žiadna otázka.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 InstanciaTestu it = new InstanciaTestu(test, vybrane);
 
                 Intent intent = new Intent(getActivity(), QuestionActivity.class);
@@ -202,7 +206,7 @@ public class TestParametersDialogFragment extends DialogFragment {
             }
         }
         //System.out.println("vybrane hodnoty min: " + min + " max: " + max);
-        App.zaloguj(App.DEBUG,TAG,"vybrane hodnoty min: " + min + " max: " + max);
+        App.zaloguj(App.DEBUG, TAG, "vybrane hodnoty min: " + min + " max: " + max);
         vybrane = new ArrayList<>();
         for (int i = min - 1; i < max; i++) { // 1..10 == 0..9 v liste
             int stat = test.getQuestions().get(i).getStat(); // otazky v teste su v rovnakom poradi ako v teststats
@@ -218,7 +222,7 @@ public class TestParametersDialogFragment extends DialogFragment {
         oranzovaCheckBox.setText("+" + mapa.get(2));
         zelenaCheckBox.setText("+" + mapa.get(3));
         //System.out.println("vybranych otazok celkom: " + vybrane.size());
-        App.zaloguj(App.DEBUG,TAG,"vybranych otazok celkom: " + vybrane.size());
+        App.zaloguj(App.DEBUG, TAG, "vybranych otazok celkom: " + vybrane.size());
         sumarTextView.setText("Vybraných otázok celkom: " + vybrane.size());
     }
 

@@ -1,6 +1,8 @@
 package sk.jmurin.android.testy.fragments;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -14,10 +16,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -28,6 +32,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +59,6 @@ public class HallOfFameFragment extends Fragment {
 
     public static final String TAG = HallOfFameFragment.class.getSimpleName();
     public static final int DRAWER_POS = 1;
-
     public static final String TESTYMAPA = "testymapa";
     private Map<Integer, Test> testyMapa;
     private Spinner vybranyTestSpinner;
@@ -62,6 +66,7 @@ public class HallOfFameFragment extends Fragment {
     private Map<Integer, List<SkoreStats>> skoreStatsMap = new HashMap<>();
     private int vybranySpinnerItemPos;
     private List<Integer> spinnerTestIds;
+    private SharedPreferences sharedPref;
 
     public static HallOfFameFragment newInstance(Map<Integer, Test> testy) {
         HallOfFameFragment fragment = new HallOfFameFragment();
@@ -82,9 +87,13 @@ public class HallOfFameFragment extends Fragment {
             for (Integer testID : testyMapa.keySet()) {
                 skoreStatsMap.put(testID, new ArrayList<SkoreStats>());
             }
+            if (testyMapa.isEmpty()) {
+                throw new RuntimeException("pocet testov musi byt aspon 1.");
+            }
         } else {
             throw new RuntimeException("HallOfFame fragment without arguments!!!");
         }
+        sharedPref = getActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
     }
 
     @Override
@@ -121,6 +130,13 @@ public class HallOfFameFragment extends Fragment {
 
         rv = (RecyclerView) view.findViewById(R.id.recyclerview);
         rv.setLayoutManager(new LinearLayoutManager(rv.getContext()));
+
+        ImageView headerImageView = (ImageView) view.findViewById(R.id.halloffameHeaderImageView);
+
+        Glide.with(headerImageView.getContext())
+                .load(R.drawable.sien_slavy)
+                .fitCenter()
+                .into(headerImageView);
     }
 
     private void showSkoreTable(Integer testID) {
@@ -136,74 +152,72 @@ public class HallOfFameFragment extends Fragment {
         App.zaloguj(App.DEBUG, TAG, "onActivityCreated(savedInstanceState);");
     }
 
-    // TODO: progress dialog? a info o offline stave, nerefreshovat zakazdym ked sa vola tato metoda
-    // musi byt internet inak sa zobrazi hlaska o nedostupnosti statistik
+    /**
+     * tahaju sa data zo sharedPreferences. ak su data starsie ako 30 minut tak sa tahaju z webu
+     * ak sa nepodari z webu stiahnut tak sa zobrazi hlaska ze data nie su aktualne
+     */
     @Override
     public void onStart() {
         super.onStart();
         EventBus.getDefault().register(this);
         App.zaloguj(App.DEBUG, TAG, "onStart");
 
+        // zistime kedy boli data naposledy aktualizovane
+        long latestSkoreStatsTimestamp = sharedPref.getLong(getString(R.string.latest_skore_stats_timestamp), 0L);
+        String statsJSON = sharedPref.getString(getString(R.string.latest_skore_stats), null);
 
-        if (NetworkUtils.isConnected(getActivity())) {
-            // refresh statistiku zo servera
-            Request request = new Request.Builder()
-                    .url(Secrets.SKORE_STATS_API_URL)
-                    .build();
+        if (System.currentTimeMillis() - latestSkoreStatsTimestamp > 30 * 60 * 1000) {
+            // stare data mame, potrebujeme aktualizovat
+            if (NetworkUtils.isConnected(getActivity())) {
+                // refresh statistiku zo servera
+                Request request = new Request.Builder()
+                        .url(Secrets.SKORE_STATS_API_URL)
+                        .build();
 
-            final OkHttpClient client = new OkHttpClient();
-            client.newCall(request).enqueue(new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    App.zaloguj(App.DEBUG, TAG, "onFailure");
-                }
-
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    App.zaloguj(App.DEBUG, TAG, "onResponse(Call call, Response response)");
-                    if (response.isSuccessful()) {
-                        Headers responseHeaders = response.headers();
-                        App.zaloguj(App.DEBUG, TAG, "response.isSuccessful() RESPONSE HEADERS:");
-                        for (int i = 0, size = responseHeaders.size(); i < size; i++) {
-                            //Log.d(TAG, responseHeaders.name(i) + ": " + responseHeaders.value(i));
-                            App.zaloguj(App.DEBUG, TAG, responseHeaders.name(i) + ": " + responseHeaders.value(i));
-                        }
-
-                        String jsonResponse = response.body().string();
-                        App.zaloguj(App.DEBUG, TAG, "server response:" + jsonResponse);
-                        ObjectMapper mapper = new ObjectMapper();
-                        List<SkoreStats> skores;
-                        try {
-                            skores = mapper.readValue(jsonResponse, new TypeReference<List<SkoreStats>>() {
-                            });
-                            App.zaloguj(App.DEBUG, TAG, "nacitane skore stats list: " + skores);
-
-                            // resetneme stare skore staty
-                            for (Integer testID : skoreStatsMap.keySet()) {
-                                skoreStatsMap.put(testID, new ArrayList<SkoreStats>());
-                            }
-                            // server nam poslal vsetky skore staty, teraz ich nahadzeme do nasej mapy
-                            for (SkoreStats ss : skores) {
-                                if (skoreStatsMap.keySet().contains(ss.testID)) {
-                                    // tento stat nas zaujima lebo je medzi nasimi aktivnymi testami v mape
-                                    skoreStatsMap.get(ss.testID).add(ss);
-                                }
-                            }
-                            // skore staty su rozdelene podla testID a usporiadane tak ako nam ich vyhodil rest server
-                            EventBus.getDefault().post(new EventBusEvents.SkoreStatsDownloaded());
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            EventBus.getDefault().post(new EventBusEvents.DownloadError("Server odpovedal, ale nepodarilo sa nacitat data zo servera."));
-                        }
-
-
-                    } else {
-                        EventBus.getDefault().post(new EventBusEvents.DownloadError("Server neodpovedal, data nie su dostupne."));
+                final OkHttpClient client = new OkHttpClient();
+                client.newCall(request).enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        App.zaloguj(App.DEBUG, TAG, "onFailure");
                     }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        if (response.isSuccessful()) {
+                            String jsonResponse = response.body().string();
+                            ObjectMapper mapper = new ObjectMapper();
+                            List<SkoreStats> skores;
+                            try {
+                                skores = mapper.readValue(jsonResponse, new TypeReference<List<SkoreStats>>() {
+                                });
+                                EventBus.getDefault().post(new EventBusEvents.SkoreStatsDownloaded(skores));
+                                // ulozime najnovsie skore stats, predpokladam ze sa vojdu do stringu do shared preferences
+                                // TODO: osetrit velkost json stringu
+                                SharedPreferences.Editor editor = sharedPref.edit();
+                                editor.putString(getString(R.string.latest_skore_stats), jsonResponse);
+                                editor.putLong(getString(R.string.latest_skore_stats_timestamp), System.currentTimeMillis());
+                                editor.commit();
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                EventBus.getDefault().post(new EventBusEvents.DownloadError("Server odpovedal, ale nepodarilo sa nacitat data zo servera."));
+                            }
+                        } else {
+                            EventBus.getDefault().post(new EventBusEvents.DownloadError("Server neodpovedal, data nie su dostupne."));
+                        }
+                    }
+                });
+            } else {
+                if (latestSkoreStatsTimestamp == 0) {
+                    Toast.makeText(getActivity(), "Nepodarilo sa pripojiť k internetu. Nie sú dostupné aktuálne dáta.", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getActivity(), "Nepodarilo sa pripojiť k internetu. Posledná aktualizácia " + App.sdf.format(new Date(latestSkoreStatsTimestamp)) + ".", Toast.LENGTH_SHORT).show();
+                    refreshSkoreStats(statsJSON);
                 }
-            });
+            }
         } else {
-            Toast.makeText(getActivity(), "Nepodarilo sa pripojiť k internetu. Nie sú dostupné aktuálne dáta.", Toast.LENGTH_SHORT).show();
+            App.zaloguj(App.DEBUG, TAG, "mame akoze aktualne data, refreshujem zo shared preferences");
+            refreshSkoreStats(statsJSON);
         }
     }
 
@@ -216,7 +230,35 @@ public class HallOfFameFragment extends Fragment {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onDownloadEvent(final EventBusEvents.SkoreStatsDownloaded skoreDownloaded) {
         App.zaloguj(App.DEBUG, TAG, "onDownloadEvent: SkoreStatsDownloaded");
-        vybranyTestSpinner.setSelection(vybranySpinnerItemPos);
+        refreshSkoreStats(skoreDownloaded.skores);
+    }
+
+    private void refreshSkoreStats(String skoresJSON) {
+        // mame "aktualne data", aktualizujeme zo sharedPreferences
+        ObjectMapper mapper = new ObjectMapper();
+        List<SkoreStats> skores;
+        try {
+            skores = mapper.readValue(skoresJSON, new TypeReference<List<SkoreStats>>() {
+            });
+            refreshSkoreStats(skores);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void refreshSkoreStats(List<SkoreStats> skores) {
+        // resetneme stare skore staty
+        for (Integer testID : skoreStatsMap.keySet()) {
+            skoreStatsMap.put(testID, new ArrayList<SkoreStats>());
+        }
+        // skore staty, teraz ich nahadzeme do nasej mapy
+        for (SkoreStats ss : skores) {
+            if (skoreStatsMap.keySet().contains(ss.testID)) {
+                // tento stat nas zaujima lebo je medzi nasimi aktivnymi testami v mape
+                skoreStatsMap.get(ss.testID).add(ss);
+            }
+        }
+        vybranyTestSpinner.setSelection(vybranySpinnerItemPos); // zlyha ak sme mali v oncreate prazdny zoznam testov
         showSkoreTable(spinnerTestIds.get(vybranySpinnerItemPos));
     }
 
@@ -238,12 +280,18 @@ public class HallOfFameFragment extends Fragment {
             context.getTheme().resolveAttribute(R.attr.selectableItemBackground, mTypedValue, true);
 //            this.context = (MainActivity) context;
             mBackground = mTypedValue.resourceId;
-            listItemValues = new String[skoreStats.size()][2];
-            int i = 0;
-            for (SkoreStats ss : skoreStats) {
-                listItemValues[i][0] = ss.username;
-                listItemValues[i][1] = ss.skore + " %";
-                i++;
+            if (skoreStats.isEmpty()) {
+                listItemValues = new String[1][2];
+                listItemValues[0][0] = "žiadne dáta";
+                listItemValues[0][1] = " ";
+            } else {
+                listItemValues = new String[skoreStats.size()][2];
+                int i = 0;
+                for (SkoreStats ss : skoreStats) {
+                    listItemValues[i][0] = ss.username;
+                    listItemValues[i][1] = ss.skore + " %";
+                    i++;
+                }
             }
         }
 

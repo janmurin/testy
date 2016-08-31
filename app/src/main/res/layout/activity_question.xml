@@ -13,18 +13,35 @@
         android:id="@+id/otazkaTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="18sp"/>
-
-    <ListView
-        android:id="@+id/odpovedeListView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/otazkaTextView"></ListView>
+        android:textSize="18sp" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/odpovedeListView">
+        android:orientation="vertical"
+        android:layout_above="@+id/nextButtonsLinearLayout"
+        android:layout_below="@id/otazkaTextView">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <ListView
+                android:id="@+id/odpovedeListView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"></ListView>
+
+
+        </ScrollView>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/nextButtonsLinearLayout"
+        android:layout_alignParentBottom="true">
 
         <Button
             android:id="@+id/predButton"

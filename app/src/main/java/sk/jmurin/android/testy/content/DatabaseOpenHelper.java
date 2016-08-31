@@ -28,6 +28,23 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
         //Log.d(TAG, "onCreate(SQLiteDatabase db)");
         App.zaloguj(App.DEBUG,TAG,"onCreate(SQLiteDatabase db)");
         db.execSQL(createQuestionsStatsTable());
+        db.execSQL(createStatsNotSentTable());
+    }
+
+    private String createStatsNotSentTable() {
+        final String query = DbUtils.TableBuilder.table(DataContract.Tables.STATS_NOT_SENT)
+                .primaryKey(DataContract.StatsNotSent._ID)
+                .columnText(DataContract.StatsNotSent.DEVICE_ID)
+                .columnText(DataContract.StatsNotSent.SKORE)
+                .columnText(DataContract.StatsNotSent.STATS)
+                .columnText(DataContract.StatsNotSent.TEST_ID)
+                .columnText(DataContract.StatsNotSent.TEST_VERSION)
+                .columnText(DataContract.StatsNotSent.TIME_CREATED)
+                .columnText(DataContract.StatsNotSent.USERNAME)
+                .build();
+        //Log.d(TAG, "query: "+query);
+        App.zaloguj(App.DEBUG,TAG,"query: "+query);
+        return query;
     }
 
     @Override

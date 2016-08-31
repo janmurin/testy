@@ -2,6 +2,8 @@ package sk.jmurin.android.testy.utils;
 
 import java.util.List;
 
+import sk.jmurin.android.testy.entities.SkoreStats;
+
 
 /**
  * Created by jan.murin on 16-Aug-16.
@@ -37,6 +39,11 @@ public final class EventBusEvents {
     }
 
     public static class SkoreStatsDownloaded {
+        public final List<SkoreStats> skores;
+
+        public SkoreStatsDownloaded(List<SkoreStats> skores) {
+            this.skores=skores;
+        }
     }
 
     public static class DownloadError {
@@ -47,4 +54,11 @@ public final class EventBusEvents {
         }
     }
 
+    public static class InsertStatsResponse {
+        public final String messsage;
+
+        public InsertStatsResponse(String s) {
+            this.messsage=s;
+        }
+    }
 }

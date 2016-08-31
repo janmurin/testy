@@ -23,8 +23,9 @@ public class MyContentProvider extends ContentProvider {
     private static final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     static {
-        uriMatcher.addURI(DataContract.AUTHORITY, DataContract.Tables.QUESTION_STATS, DataContract.Codes.QUESTIONS);
-        uriMatcher.addURI(DataContract.AUTHORITY, DataContract.Tables.QUESTION_STAT_ID, DataContract.Codes.QUESTIONS_ID);
+        uriMatcher.addURI(DataContract.AUTHORITY, DataContract.Tables.QUESTION_STATS, DataContract.Codes.QUESTION_STATS);
+        uriMatcher.addURI(DataContract.AUTHORITY, DataContract.Tables.QUESTION_STAT_ID, DataContract.Codes.QUESTIONS_STATS_ID);
+        uriMatcher.addURI(DataContract.AUTHORITY, DataContract.Tables.STATS_NOT_SENT, DataContract.Codes.STATS_NOT_SENT);
     }
 
     private SQLiteDatabase db;
@@ -42,10 +43,12 @@ public class MyContentProvider extends ContentProvider {
     @Override
     public String getType(Uri uri) {
         switch (uriMatcher.match(uri)) {
-            case DataContract.Codes.QUESTIONS:
+            case DataContract.Codes.QUESTION_STATS:
                 return DataContract.QuestionStats.CONTENT_TYPE;
-            case DataContract.Codes.QUESTIONS_ID:
+            case DataContract.Codes.QUESTIONS_STATS_ID:
                 return DataContract.QuestionStats.CONTENT_TYPE_ITEM;
+            case DataContract.Codes.STATS_NOT_SENT:
+                return DataContract.StatsNotSent.CONTENT_TYPE;
             default:
                 throw new RuntimeException("Unknown uri: " + uri);
         }
@@ -58,12 +61,15 @@ public class MyContentProvider extends ContentProvider {
         String groupBy = null;
 
         switch (uriMatcher.match(uri)) {
-            case DataContract.Codes.QUESTIONS:
+            case DataContract.Codes.QUESTION_STATS:
                 queryBuilder.setTables(DataContract.Tables.QUESTION_STATS);
                 break;
-            case DataContract.Codes.QUESTIONS_ID:
+            case DataContract.Codes.QUESTIONS_STATS_ID:
                 queryBuilder.setTables(DataContract.Tables.QUESTION_STATS);
                 queryBuilder.appendWhere(DataContract.QuestionStats._ID + "=" + uri.getLastPathSegment());
+                break;
+            case DataContract.Codes.STATS_NOT_SENT:
+                queryBuilder.setTables(DataContract.Tables.STATS_NOT_SENT);
                 break;
             default:
                 throw new RuntimeException("Unknown uri: " + uri);
@@ -84,8 +90,11 @@ public class MyContentProvider extends ContentProvider {
     public Uri insert(Uri uri, ContentValues values) {
         long id = 0;
         switch (uriMatcher.match(uri)) {
-            case DataContract.Codes.QUESTIONS:
+            case DataContract.Codes.QUESTION_STATS:
                 id = db.insertWithOnConflict(DataContract.Tables.QUESTION_STATS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+                break;
+            case DataContract.Codes.STATS_NOT_SENT:
+                id = db.insertWithOnConflict(DataContract.Tables.STATS_NOT_SENT, null, values, SQLiteDatabase.CONFLICT_REPLACE);
                 break;
             default:
                 throw new RuntimeException("Unknown uri: " + uri);
@@ -100,7 +109,7 @@ public class MyContentProvider extends ContentProvider {
         int numInserted = 0;
         String table;
         switch (uriMatcher.match(uri)) {
-            case DataContract.Codes.QUESTIONS:
+            case DataContract.Codes.QUESTION_STATS:
                 table = DataContract.Tables.QUESTION_STATS;
                 break;
             default:
@@ -124,8 +133,11 @@ public class MyContentProvider extends ContentProvider {
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         int delCount = 0;
         switch (uriMatcher.match(uri)) {
-            case DataContract.Codes.QUESTIONS:
+            case DataContract.Codes.QUESTION_STATS:
                 delCount = db.delete(DataContract.Tables.QUESTION_STATS, selection, selectionArgs);
+                break;
+            case DataContract.Codes.STATS_NOT_SENT:
+                delCount = db.delete(DataContract.Tables.STATS_NOT_SENT, selection, selectionArgs);
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported URI: " + uri);
@@ -141,10 +153,10 @@ public class MyContentProvider extends ContentProvider {
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         int updateCount = 0;
         switch (uriMatcher.match(uri)) {
-            case DataContract.Codes.QUESTIONS:
+            case DataContract.Codes.QUESTION_STATS:
                 updateCount = db.update(DataContract.Tables.QUESTION_STATS, values, selection, selectionArgs);
                 break;
-            case DataContract.Codes.QUESTIONS_ID:
+            case DataContract.Codes.QUESTIONS_STATS_ID:
                 int id = Integer.parseInt(uri.getLastPathSegment());
                 updateCount = db.update(DataContract.Tables.QUESTION_STATS, values, DataContract.QuestionStats._ID + "=" + id, selectionArgs);
                 break;

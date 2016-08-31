@@ -12,4 +12,6 @@
     <string name="username_preference_key">username_preference_key</string>
     <string name="device_id_preference_key">device_id_preference_key</string>
     <string name="assets_tests_initialized_preference_key">assetsTestsInitialized</string>
+    <string name="latest_skore_stats" >latest_skore_stats</string>
+    <string name="latest_skore_stats_timestamp" >latest_skore_stats_timestamp</string>
 </resources>

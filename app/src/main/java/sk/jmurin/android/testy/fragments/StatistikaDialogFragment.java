@@ -1,7 +1,11 @@
 package sk.jmurin.android.testy.fragments;
 
 import android.app.Dialog;
+import android.content.AsyncQueryHandler;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
@@ -11,6 +15,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+
+import junit.framework.Assert;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -33,10 +43,14 @@ import okhttp3.Response;
 import sk.jmurin.android.testy.App;
 import sk.jmurin.android.testy.R;
 import sk.jmurin.android.testy.Secrets;
+import sk.jmurin.android.testy.content.DataContract;
+import sk.jmurin.android.testy.content.Defaults;
 import sk.jmurin.android.testy.entities.Question;
 import sk.jmurin.android.testy.entities.Statistika;
 import sk.jmurin.android.testy.gui.InstanciaTestu;
 import sk.jmurin.android.testy.gui.QuestionActivity;
+import sk.jmurin.android.testy.utils.EventBusEvents;
+import sk.jmurin.android.testy.utils.NetworkUtils;
 
 /**
  * Created by jan.murin on 18-Aug-16.
@@ -92,6 +106,18 @@ public class StatistikaDialogFragment extends DialogFragment {
         return st;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
     /**
      * The system calls this to get the DialogFragment's layout, regardless
      * of whether it's being displayed as a dialog or an embedded fragment.
@@ -130,7 +156,7 @@ public class StatistikaDialogFragment extends DialogFragment {
             public void onClick(View v) {
                 dismiss();
                 //Log.d(TAG, "opakujeme test so zle zodpovedanymi otazkami");
-                App.zaloguj(App.DEBUG,TAG,"opakujeme test so zle zodpovedanymi otazkami");
+                App.zaloguj(App.DEBUG, TAG, "opakujeme test so zle zodpovedanymi otazkami");
                 List<Question> otazky = new ArrayList<>();
                 for (int i = 0; i < statistika.zleZodpovedane.length; i++) {
                     otazky.add(instanciaTestu.test.getQuestions().get(statistika.zleZodpovedane[i]));// idcko otazky je zhodne s poradovym cislom v zozname otazok
@@ -155,68 +181,110 @@ public class StatistikaDialogFragment extends DialogFragment {
             }
         });
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        // TODO: v emulatore mi nastavuje o 2 hodiny skorsi cas
         Calendar instance = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
 
-        RequestBody formBody = new FormBody.Builder()
-                .add("username", App.USERNAME)
-                .add("deviceID", App.DEVICE_ID)
-                .add("testID", "" + instanciaTestu.test.getId())
-                .add("testVersion", "" + instanciaTestu.test.getVersion())
-                .add("timeCreated", sdf.format(instance.getTime()))
-                .add("stats", statistika.serverStatistika)
-                .add("skore", "" + instanciaTestu.test.getSkorePercento())
-                .build();
-        Request request = new Request.Builder()
-                .url(Secrets.TESTY_STATS_INSERT_API_URL)
-                .post(formBody)
-                .build();
+        if (NetworkUtils.isConnected(NetworkUtils.getActiveNetworkInfo(getActivity()))) {
+            // posleme na server data
 
-        final OkHttpClient client = new OkHttpClient();
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                //Log.e(TAG, "onFailure");
-                App.zaloguj(App.DEBUG,TAG,"onFailure");
-            }
+            RequestBody formBody = new FormBody.Builder()
+                    .add("username", App.USERNAME)
+                    .add("deviceID", App.DEVICE_ID)
+                    .add("testID", "" + instanciaTestu.test.getId())
+                    .add("testVersion", "" + instanciaTestu.test.getVersion())
+                    .add("timeCreated", App.sdf.format(instance.getTime()))
+                    .add("stats", statistika.serverStatistika)
+                    .add("skore", "" + instanciaTestu.test.getSkorePercento())
+                    .build();
+            App.zaloguj(App.DEBUG, TAG, "odosielany form body: " + formBody.toString());
+            Request request = new Request.Builder()
+                    .url(Secrets.TESTY_STATS_INSERT_API_URL)
+                    .post(formBody)
+                    .build();
 
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    Headers responseHeaders = response.headers();
-                    for (int i = 0, size = responseHeaders.size(); i < size; i++) {
-                        Log.d(TAG, responseHeaders.name(i) + ": " + responseHeaders.value(i));
-                    }
-
-                    String jsonResponse = response.body().string();
-                    Log.d(TAG, jsonResponse);
-//                    try {
-//                        ObjectMapper mapper = new ObjectMapper();
-//                        List<TestInformation> testsInfo = mapper.readValue(jsonResponse, new TypeReference<List<TestInformation>>() {
-//                        });
-//                        List<TestInformation> nove = new ArrayList<>();
-//                        for (TestInformation ti : testsInfo) {
-//                            if (!jsonTestsInfo.contains(ti)) {
-//                                nove.add(ti);
-//                            }
-//                        }
-//                        // upovedomime aktivitu o vysledku requestu
-//                        if (!nove.isEmpty()) {
-//                            Log.d(TAG, "spustam stahovanie novych testov size: " + nove.size());
-//                            EventBus.getDefault().post(new EventBusEvents.NewTestsToDownload(nove));
-//                        } else {
-//                            EventBus.getDefault().post(new EventBusEvents.NothingToDownload());
-//                        }
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                        // TODO: ohandlovat chybu ked sa nenaparsuje testsInfo
-//                    }
-                } else {
-                    //TODO: upozornit usera ze server neodpovedal spravne
-                    throw new IOException("Unexpected code " + response);
+            final OkHttpClient client = new OkHttpClient();
+            client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    //Log.e(TAG, "onFailure");
+                    //App.zaloguj(App.DEBUG, TAG, "onFailure");
+                    EventBus.getDefault().post(new EventBusEvents.InsertStatsResponse("insert stats response: " + e.getMessage()));
                 }
-            }
-        });
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    if (response.isSuccessful()) {
+                        //Headers responseHeaders = response.headers();
+//                    for (int i = 0, size = responseHeaders.size(); i < size; i++) {
+//                        App.zaloguj(App.DEBUG,TAG,responseHeaders.name(i) + ": " + responseHeaders.value(i));
+//                    }
+
+                        String jsonResponse = response.body().string();
+                        EventBus.getDefault().post(new EventBusEvents.InsertStatsResponse("insert stats response: " + jsonResponse));
+
+                    } else {
+                        //TODO: upozornit usera ze server neodpovedal spravne
+                        throw new IOException("Unexpected code " + response);
+                    }
+                }
+            });
+
+        } else {
+            // ulozime do databazy a odosle sa neskor
+            Uri uri = DataContract.StatsNotSent.CONTENT_URI
+                    .buildUpon()
+                    .build();
+            ContentValues values = new ContentValues();
+            values.put(DataContract.StatsNotSent.DEVICE_ID, App.DEVICE_ID);
+            values.put(DataContract.StatsNotSent.SKORE, instanciaTestu.test.getSkorePercento());
+            values.put(DataContract.StatsNotSent.STATS, statistika.serverStatistika);
+            values.put(DataContract.StatsNotSent.TEST_ID, instanciaTestu.test.getId());
+            values.put(DataContract.StatsNotSent.TEST_VERSION, instanciaTestu.test.getVersion());
+            values.put(DataContract.StatsNotSent.TIME_CREATED, App.sdf.format(instance.getTime()));
+            values.put(DataContract.StatsNotSent.USERNAME, App.USERNAME);
+            // App.zaloguj(App.DEBUG, TAG,"updating db with " + novyStat + " for id " + db_id);
+
+            AsyncQueryHandler insertHandler = new AsyncQueryHandler(getActivity().getContentResolver()) {
+                @Override
+                protected void onUpdateComplete(int token, Object cookie, int result) {
+                    super.onUpdateComplete(token, cookie, result);
+                    //Log.d(TAG, "onUpdateComplete token: " + token + " result: " + result);
+                    App.zaloguj(App.DEBUG, TAG, "onUpdateComplete token: " + token + " result: " + result);
+                }
+
+                @Override
+                protected void onInsertComplete(int token, Object cookie, Uri uri) {
+                    super.onInsertComplete(token, cookie, uri);
+                    Log.d(TAG, "insertCompleted");
+                }
+
+//                @Override
+//                protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+//                    super.onQueryComplete(token, cookie, cursor);
+////                Log.d(TAG, "onQueryComplete token=" + token);
+//                    App.zaloguj(App.DEBUG, TAG, "onQueryComplete token=" + token);
+//                    if (cursor.moveToNext()) {
+//                        String stats = cursor.getString(cursor.getColumnIndex(DataContract.StatsNotSent.STATS));
+//                        int db_id2 = cursor.getInt(cursor.getColumnIndex(DataContract.StatsNotSent._ID));
+//                        System.out.println("stats=" + stats);
+//                        System.out.println("db_id=" + db_id2);
+//                    } else {
+//                        // musi vzdy najst to co updatlo predtym
+//                        Assert.fail("nenaslo to co updatlo");
+//                    }
+//                    cursor.close();
+//                }
+
+            };
+            insertHandler.startInsert(0, Defaults.NO_COOKIE, uri, values);
+            //insertHandler.startQuery(2, Defaults.NO_COOKIE, uri, null, null, Defaults.NO_SELECTION_ARGS, null);
+
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventBusEvent(EventBusEvents.InsertStatsResponse response) {
+        App.zaloguj(App.DEBUG, TAG, response.messsage);
     }
 
     /**

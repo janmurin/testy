@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
+import java.text.SimpleDateFormat;
 import java.util.Map;
 
 
@@ -17,6 +18,7 @@ public class App extends Application {
     public static String USERNAME = DEFAULT_USERNAME;
     public static String DEVICE_ID;
     public static final String DEBUG = "debug";
+    public static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private static Context sInstance;
 
