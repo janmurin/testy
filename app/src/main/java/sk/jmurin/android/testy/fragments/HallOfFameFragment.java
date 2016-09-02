@@ -120,7 +120,12 @@ public class HallOfFameFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 vybranySpinnerItemPos = position;
-                showSkoreTable(spinnerTestIds.get(position));
+                //showSkoreTable(spinnerTestIds.get(position));
+                // ked sa vyberie v spinneri polozka tak sa nacitavaju data z internetu vzdy, v onstarte sa automaticky refreshnu data ak su starsie ako 30 minut
+                // TODO: push notifikacie aby sa nemuselo zakazdym dopytovat server
+                long latestSkoreStatsTimestamp = sharedPref.getLong(getString(R.string.latest_skore_stats_timestamp), 0L);
+                String statsJSON = sharedPref.getString(getString(R.string.latest_skore_stats), null);
+                nacitajNoveSkoreStaty(latestSkoreStatsTimestamp,statsJSON);
             }
 
             @Override
@@ -168,56 +173,60 @@ public class HallOfFameFragment extends Fragment {
 
         if (System.currentTimeMillis() - latestSkoreStatsTimestamp > 30 * 60 * 1000) {
             // stare data mame, potrebujeme aktualizovat
-            if (NetworkUtils.isConnected(getActivity())) {
-                // refresh statistiku zo servera
-                Request request = new Request.Builder()
-                        .url(Secrets.SKORE_STATS_API_URL)
-                        .build();
-
-                final OkHttpClient client = new OkHttpClient();
-                client.newCall(request).enqueue(new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                        App.zaloguj(App.DEBUG, TAG, "onFailure");
-                    }
-
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        if (response.isSuccessful()) {
-                            String jsonResponse = response.body().string();
-                            ObjectMapper mapper = new ObjectMapper();
-                            List<SkoreStats> skores;
-                            try {
-                                skores = mapper.readValue(jsonResponse, new TypeReference<List<SkoreStats>>() {
-                                });
-                                EventBus.getDefault().post(new EventBusEvents.SkoreStatsDownloaded(skores));
-                                // ulozime najnovsie skore stats, predpokladam ze sa vojdu do stringu do shared preferences
-                                // TODO: osetrit velkost json stringu
-                                SharedPreferences.Editor editor = sharedPref.edit();
-                                editor.putString(getString(R.string.latest_skore_stats), jsonResponse);
-                                editor.putLong(getString(R.string.latest_skore_stats_timestamp), System.currentTimeMillis());
-                                editor.commit();
-
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                EventBus.getDefault().post(new EventBusEvents.DownloadError("Server odpovedal, ale nepodarilo sa nacitat data zo servera."));
-                            }
-                        } else {
-                            EventBus.getDefault().post(new EventBusEvents.DownloadError("Server neodpovedal, data nie su dostupne."));
-                        }
-                    }
-                });
-            } else {
-                if (latestSkoreStatsTimestamp == 0) {
-                    Toast.makeText(getActivity(), "Nepodarilo sa pripojiť k internetu. Nie sú dostupné aktuálne dáta.", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getActivity(), "Nepodarilo sa pripojiť k internetu. Posledná aktualizácia " + App.sdf.format(new Date(latestSkoreStatsTimestamp)) + ".", Toast.LENGTH_SHORT).show();
-                    refreshSkoreStats(statsJSON);
-                }
-            }
+            nacitajNoveSkoreStaty(latestSkoreStatsTimestamp,statsJSON);
         } else {
             App.zaloguj(App.DEBUG, TAG, "mame akoze aktualne data, refreshujem zo shared preferences");
             refreshSkoreStats(statsJSON);
+        }
+    }
+
+    private void nacitajNoveSkoreStaty(long latestSkoreStatsTimestamp, String statsJSON){
+        if (NetworkUtils.isConnected(getActivity())) {
+            // refresh statistiku zo servera
+            Request request = new Request.Builder()
+                    .url(Secrets.SKORE_STATS_API_URL)
+                    .build();
+
+            final OkHttpClient client = new OkHttpClient();
+            client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    App.zaloguj(App.DEBUG, TAG, "onFailure");
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    if (response.isSuccessful()) {
+                        String jsonResponse = response.body().string();
+                        ObjectMapper mapper = new ObjectMapper();
+                        List<SkoreStats> skores;
+                        try {
+                            skores = mapper.readValue(jsonResponse, new TypeReference<List<SkoreStats>>() {
+                            });
+                            EventBus.getDefault().post(new EventBusEvents.SkoreStatsDownloaded(skores));
+                            // ulozime najnovsie skore stats, predpokladam ze sa vojdu do stringu do shared preferences
+                            // TODO: osetrit velkost json stringu
+                            SharedPreferences.Editor editor = sharedPref.edit();
+                            editor.putString(getString(R.string.latest_skore_stats), jsonResponse);
+                            editor.putLong(getString(R.string.latest_skore_stats_timestamp), System.currentTimeMillis());
+                            editor.commit();
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            EventBus.getDefault().post(new EventBusEvents.DownloadError("Server odpovedal, ale nepodarilo sa nacitat data zo servera."));
+                        }
+                    } else {
+                        EventBus.getDefault().post(new EventBusEvents.DownloadError("Server neodpovedal, data nie su dostupne."));
+                    }
+                }
+            });
+        } else {
+            if (latestSkoreStatsTimestamp == 0) {
+                Toast.makeText(getActivity(), "Nepodarilo sa pripojiť k internetu. Nie sú dostupné aktuálne dáta.", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getActivity(), "Nepodarilo sa pripojiť k internetu. Posledná aktualizácia " + App.sdf.format(new Date(latestSkoreStatsTimestamp)) + ".", Toast.LENGTH_SHORT).show();
+                refreshSkoreStats(statsJSON);
+            }
         }
     }
 
