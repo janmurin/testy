@@ -5,10 +5,10 @@ package sk.jmurin.android.testy.entities;
  */
 public class QuestionData {
 
-    public int stat;
-    public int db_id;
-    public int test_question_index;
-    public int test_id;
+    public final int stat;
+    public final int db_id;
+    public final int test_question_index;
+    public final int test_id;
 
     public QuestionData(int stat, int db_id, int test_question_index, int test_id) {
         this.stat = stat;
