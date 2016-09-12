@@ -179,6 +179,7 @@ public class TestParametersDialogFragment extends DialogFragment {
                 dismiss();
             }
         });
+        odfiltrujOtazky();
     }
 
     private void odfiltrujOtazky() {

@@ -255,7 +255,7 @@ public class StatistikaDialogFragment extends DialogFragment {
                 @Override
                 protected void onInsertComplete(int token, Object cookie, Uri uri) {
                     super.onInsertComplete(token, cookie, uri);
-                    Log.d(TAG, "insertCompleted");
+                    App.zaloguj(App.DEBUG,TAG, "insertCompleted");
                 }
 
 //                @Override

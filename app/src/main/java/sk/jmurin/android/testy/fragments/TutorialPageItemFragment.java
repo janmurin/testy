@@ -99,7 +99,7 @@ public class TutorialPageItemFragment extends Fragment {
                 final EditText menoEditText = (EditText) view.findViewById(R.id.menoEditText);
                 menoEditText.requestFocus();
                 InputMethodManager inputManager =(InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),InputMethodManager.SHOW_IMPLICIT);
+                inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),InputMethodManager.SHOW_FORCED);
                 final Button dalejButton3 = (Button) view.findViewById(R.id.dalejButton);
                 dalejButton3.setText("Uložiť");
                 menoEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {

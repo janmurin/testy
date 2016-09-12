@@ -1,0 +1,432 @@
+{
+  "name": "Dopravná výchova",
+  "version": 1,
+  "id": 4,
+  "questions": [
+    {
+      "question": "Po ktorej strane chodníka sa chodí:",
+      "answers": [
+        {
+          "text": "po ľavej strane",
+          "isCorrect": false
+        },
+        {
+          "text": "po pravej strane",
+          "isCorrect": true
+        },
+        {
+          "text": "ako sa komu hodí a kde je viac miesta",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Na ceste, kde nie je chodník, sa musí chodiť:",
+      "answers": [
+        {
+          "text": "po ľavom okraji",
+          "isCorrect": true
+        },
+        {
+          "text": "po pravom okraji",
+          "isCorrect": false
+        },
+        {
+          "text": "po tej strane kde je viac miesta",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Samostatne bez dozoru môže na bicykli jazdiť osoba staršia:",
+      "answers": [
+        {
+          "text": "8 rokov",
+          "isCorrect": false
+        },
+        {
+          "text": "10 rokov",
+          "isCorrect": true
+        },
+        {
+          "text": "12 rokov",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Po ceste sa jazdí:",
+      "answers": [
+        {
+          "text": "vpravo, čo najbližšie k pravému okraju vozovky",
+          "isCorrect": true
+        },
+        {
+          "text": "vpravo, čo najbližšie k stredu vozovky",
+          "isCorrect": false
+        },
+        {
+          "text": "vľavo",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Znamenie o zmene smeru jazdy dávame rukou:",
+      "answers": [
+        {
+          "text": "len pri predchádzaní",
+          "isCorrect": false
+        },
+        {
+          "text": "len pri odbočovaní",
+          "isCorrect": false
+        },
+        {
+          "text": "vždy pri zmene smeru jazdy",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "question": "Pri zníženej viditeľnosti:",
+      "answers": [
+        {
+          "text": "stačí, keď má cyklista rozsvietenú lampu, zavesenú na bicykli",
+          "isCorrect": false
+        },
+        {
+          "text": "stačí, keď cyklista drží v ruke vreckovú lampu",
+          "isCorrect": false
+        },
+        {
+          "text": "musí mať bicykel rozsvietenú lampu pripevnenú",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "question": "Pri odbočovaní vľavo je cyklista povinný:",
+      "answers": [
+        {
+          "text": "dať znamenie o zmene smeru jazdy, zájsť čo najbližšie k stredu vozovky a plynulo odbočiť",
+          "isCorrect": false
+        },
+        {
+          "text": "dať znamenie o zmene smeru jazdy, zájsť čo najbližšie k stredu vozovky a dať prednosť protiidúcim vozidlám a električkám v oboch smeroch",
+          "isCorrect": true
+        },
+        {
+          "text": "dať znamenie o zmene smeru jazdy a plynulo odbočiť",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Ak sa začínajú zatvárať závory, alebo aj dávané svetelné alebo iné výstražné znamenie:",
+      "answers": [
+        {
+          "text": "je možné so zvýšenou opatrnosťou prejsť cez prejazd, avšak iba vtedy, ak nie je počuť alebo vidieť prichádzajúci vlak",
+          "isCorrect": false
+        },
+        {
+          "text": "je možné prejsť cez prejazd, ale urýchlene",
+          "isCorrect": false
+        },
+        {
+          "text": "je zakázané vojsť na prejazd",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "question": "Na križovatke dvoch ciest nerozlíšených dopravnou značkou má prednosť v jazde:",
+      "answers": [
+        {
+          "text": "vozidlo rýchlejšie",
+          "isCorrect": false
+        },
+        {
+          "text": "vozidlo prichádzajúce sprava",
+          "isCorrect": true
+        },
+        {
+          "text": "vozidlo prichádzajúce zľava",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Na bicykli, ktorý nie je vybavený druhým sedadlom so stupačkami:",
+      "answers": [
+        {
+          "text": "môže sa prepravovať druhá osoba vo veku najviac 7 rokov",
+          "isCorrect": false
+        },
+        {
+          "text": "môže sa prepravovať druhá osoba vo veku najviac 10 rokov",
+          "isCorrect": false
+        },
+        {
+          "text": "nesmie sa prepravovať druhá osoba",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "question": "Pri vychádzaní na cestu z poľnej alebo lesnej cesty alebo z miest ležiacich mimo cesty je cyklista povinný dať prednosť:",
+      "answers": [
+        {
+          "text": "všetkým vozidlám idúcim po ceste",
+          "isCorrect": true
+        },
+        {
+          "text": "iba vozidlám nemotorovým",
+          "isCorrect": false
+        },
+        {
+          "text": "iba vozidlám prichádzajúcim sprava",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Na príkaz dopravnej značky „Daj prednosť vjazde“ je cyklista povinný dať prednosť v jazde:",
+      "answers": [
+        {
+          "text": "vozidlám prichádzajúcim sprava",
+          "isCorrect": false
+        },
+        {
+          "text": "vozidlám idúcim po hlavnej ceste",
+          "isCorrect": true
+        },
+        {
+          "text": "iba motorovým vozidlám",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Osoba, ktorá vykonáva dozor nad cyklistom mladším ako 10 rokov, musí byť staršia ako:",
+      "answers": [
+        {
+          "text": "10 rokov",
+          "isCorrect": false
+        },
+        {
+          "text": "14 rokov",
+          "isCorrect": false
+        },
+        {
+          "text": "15 rokov",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "question": "Ak je cyklista predchádzaný:",
+      "answers": [
+        {
+          "text": "nesmie už predchádzať iné vozidlo",
+          "isCorrect": true
+        },
+        {
+          "text": "môže predchádzať iba nemotorové vozidlá",
+          "isCorrect": false
+        },
+        {
+          "text": "môže predchádzať iba motorové vozidlá",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Cyklisti môžu jazdiť:",
+      "answers": [
+        {
+          "text": "len jednotlivo za sebou",
+          "isCorrect": true
+        },
+        {
+          "text": "najviac dvaja vedľa seba",
+          "isCorrect": false
+        },
+        {
+          "text": "najviac traja vedľa seba",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Ak je križovatka riadená svetelnými signálmi alebo prechod pre chodcov je riadený svetelnými signálmi, môžu chodci prechádzať:",
+      "answers": [
+        {
+          "text": "ak nie je v blízkosti idúce vozidlo, kdekoľvek",
+          "isCorrect": false
+        },
+        {
+          "text": "len na prechode",
+          "isCorrect": true
+        },
+        {
+          "text": "ľubovoľne pri dodržiavaní bezpečnosti",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Hneď ako vstúpi chodec na vozovku:",
+      "answers": [
+        {
+          "text": "nesmie sa tam bezdôvodne zdržiavať alebo zastavovať",
+          "isCorrect": true
+        },
+        {
+          "text": "môže sa tam zdržiavať",
+          "isCorrect": false
+        },
+        {
+          "text": "nesmie sa vracať",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Cyklista môže viesť jazdné kolo:",
+      "answers": [
+        {
+          "text": "len jednotlivo za sebou",
+          "isCorrect": true
+        },
+        {
+          "text": "maximálne dve vedľa seba",
+          "isCorrect": false
+        },
+        {
+          "text": "najviac tri vedľa seba",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Na príkaz dopravnej značky „Stoj daj prednosť v jazde“, musí cyklista zastaviť:",
+      "answers": [
+        {
+          "text": "vedľa tejto dopravnej značky",
+          "isCorrect": false
+        },
+        {
+          "text": "na takom mieste, z ktorého má do križovatky dobrý rozhľad",
+          "isCorrect": true
+        },
+        {
+          "text": "len vtedy, ak do križovatky vchádza iné vozidlo",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Ak je v blízkosti nadjazd alebo podjazd:",
+      "answers": [
+        {
+          "text": "sú chodci povinní používať ho",
+          "isCorrect": true
+        },
+        {
+          "text": "používať ho podľa potreby",
+          "isCorrect": false
+        },
+        {
+          "text": "nie sú povinní používať ho",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Čo musí urobiť chodec pred vstupom na vozovku?",
+      "answers": [
+        {
+          "text": "zastaviť sa a až potom rýchlo prejsť",
+          "isCorrect": false
+        },
+        {
+          "text": "presvedčiť sa vzhľadom na prekážku, ktorá mu prípadne bráni v rozhľade, či môže prejsť vozovku bez nebezpečia",
+          "isCorrect": true
+        },
+        {
+          "text": "pripraviť sa k rýchlemu prechodu cez vozovku",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Chodci prechádzajú vozovku:",
+      "answers": [
+        {
+          "text": "iba ak je prichádzajúce vozidlo vzdialené aspoň 100m",
+          "isCorrect": false
+        },
+        {
+          "text": "len keď vozidlá idú pomaly",
+          "isCorrect": false
+        },
+        {
+          "text": "len s ohľadom na vzdialenosť a rýchlosť prichádzajúceho vozidla tak, aby neprinútili k zmene smeru alebo rých.jazdy",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "question": "Ak vychádza cyklista od chodníka do vozovky pri rozjazde:",
+      "answers": [
+        {
+          "text": "nemusí dávať znamenie o zmene smeru jazdy",
+          "isCorrect": false
+        },
+        {
+          "text": "dáva znamenie iba vtedy, ak sa blíži nejaké vozidlo",
+          "isCorrect": false
+        },
+        {
+          "text": "musí dávať znamenie o zmene smeru jazdy",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "question": "Kedy môže cyklista viesť bicykel po chodníku?",
+      "answers": [
+        {
+          "text": "kedykoľvek",
+          "isCorrect": false
+        },
+        {
+          "text": "len keď je to nutné",
+          "isCorrect": false
+        },
+        {
+          "text": "ak tým nie sú ohrození alebo obmedzovaní chodci",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "question": "Kde môže cyklista na jazdu alebo vedenie bicykla používať aj pravú krajnicu?",
+      "answers": [
+        {
+          "text": "len v meste",
+          "isCorrect": false
+        },
+        {
+          "text": "len na vyznačených úsekoch vozovky",
+          "isCorrect": false
+        },
+        {
+          "text": "mimo obce",
+          "isCorrect": true
+        }
+      ]
+    }
+  ]
+}

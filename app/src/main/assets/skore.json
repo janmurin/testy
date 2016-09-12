@@ -1,30 +1,74 @@
 [
   {
-    "username": "janik",
-    "deviceID": " ffffffff-fce1-1976-f244-72c05ad2d24c",
-    "testID",
-    " 2",
-    "skore": " 96"
+    "username": "janco",
+    "deviceID": "ffffffff-fce1-1976-f244-72c05ad2d24c",
+    "testID": "1",
+    "skore": "38"
   },
   {
-    "username": "janik",
-    "deviceID": " ffffffff-fce1-1976-f244-72c05ad2d24c",
-    "testID",
-    " 1",
-    "skore": " 55"
+    "username": "janko hras",
+    "deviceID": "ffffffff-fdd0-5068-ffff-ffff99d603a9",
+    "testID": "1",
+    "skore": "33"
   },
   {
-    "username": "simonka",
-    "deviceID": " ffffffff-890b-bb1b-ffff-ffff99d603a9",
-    "testID",
-    " 2",
-    "skore": " 36"
+    "username": "samsung",
+    "deviceID": "00000000-3309-af05-ffff-ffffc677f1b4",
+    "testID": "1",
+    "skore": "5"
   },
   {
-    "username": "simonka",
-    "deviceID": " ffffffff-890b-bb1b-ffff-ffff99d603a9",
-    "testID",
-    " 1",
-    "skore": " 61"
+    "username": "dgrwgdfsbg",
+    "deviceID": "ffffffff-890b-bb1b-ffff-ffff99d603a9",
+    "testID": "1",
+    "skore": "0"
+  },
+  {
+    "username": "fantomas",
+    "deviceID": "00000000-3309-af05-ffff-ffffc677f1b4",
+    "testID": "2",
+    "skore": "33"
+  },
+  {
+    "username": "janko hras",
+    "deviceID": "ffffffff-fdd0-5068-ffff-ffff99d603a9",
+    "testID": "2",
+    "skore": "33"
+  },
+  {
+    "username": "jan murin",
+    "deviceID": "ffffffff-890b-bb1b-ffff-ffff99d603a9",
+    "testID": "2",
+    "skore": "33"
+  },
+  {
+    "username": "janco",
+    "deviceID": "ffffffff-fce1-1976-f244-72c05ad2d24c",
+    "testID": "2",
+    "skore": "0"
+  },
+  {
+    "username": "fantomas",
+    "deviceID": "00000000-3309-af05-ffff-ffffc677f1b4",
+    "testID": "3",
+    "skore": "33"
+  },
+  {
+    "username": "janko hras",
+    "deviceID": "ffffffff-fdd0-5068-ffff-ffff99d603a9",
+    "testID": "3",
+    "skore": "0"
+  },
+  {
+    "username": "jan murin",
+    "deviceID": "ffffffff-e555-4231-ffff-ffff99d603a9",
+    "testID": "4",
+    "skore": "100"
+  },
+  {
+    "username": "macko usko",
+    "deviceID": "ffffffff-fce1-1976-f244-72c05ad2d24c",
+    "testID": "4",
+    "skore": "21"
   }
 ]

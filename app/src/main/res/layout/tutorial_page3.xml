@@ -21,7 +21,7 @@
             android:focusable="true"
             android:layout_height="wrap_content"
             android:id="@+id/menoEditText"
-            android:maxLength="10"
+            android:maxLength="20"
             android:inputType="textPersonName"
             android:imeOptions="actionDone"/>
     </LinearLayout>
